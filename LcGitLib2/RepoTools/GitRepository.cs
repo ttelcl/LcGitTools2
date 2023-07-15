@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -10,14 +10,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.Cfg;
-using LcGitLib.GitConfigFiles;
-using LcGitLib.GitRunning;
-using LcGitLib.GraphModel;
-using LcGitLib.MetaBase;
-using LcGitLib.RawLog;
+using LcGitLib2.Cfg;
+using LcGitLib2.GitConfigFiles;
+using LcGitLib2.GitRunning;
+using LcGitLib2.GraphModel;
+using LcGitLib2.MetaBase;
+using LcGitLib2.RawLog;
 
-namespace LcGitLib.RepoTools
+namespace LcGitLib2.RepoTools
 {
   /// <summary>
   /// Utility class representing a GIT repository, acting as entry point API

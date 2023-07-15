@@ -1,8 +1,8 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
-using LcGitLib.GraphModel;
+using LcGitLib2.GraphModel;
 
 using Newtonsoft.Json;
 using System;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.RawLog
+namespace LcGitLib2.RawLog
 {
   /// <summary>
   /// Represents a full commit entry as read from "git log --pretty=raw" output.

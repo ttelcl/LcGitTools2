@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LcGitLib.GitRunning
+namespace LcGitLib2.GitRunning
 {
   /// <summary>
   /// Receives the list of arguments about to be passed to the git executable

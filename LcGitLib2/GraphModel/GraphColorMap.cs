@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.GraphModel
+namespace LcGitLib2.GraphModel
 {
   /// <summary>
   /// A data structure for "Graph coloring" algorithms.

@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.RawLog
+namespace LcGitLib2.RawLog
 {
   /// <summary>
   /// A graph model for a set of related commits

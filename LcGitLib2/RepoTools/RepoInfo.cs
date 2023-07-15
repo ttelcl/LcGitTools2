@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.Cfg;
+using LcGitLib2.Cfg;
 
-namespace LcGitLib.RepoTools
+namespace LcGitLib2.RepoTools
 {
   /// <summary>
   /// Static information about a repository, as a view on a ConfigBlob

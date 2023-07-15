@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LcGitLib.GraphModel
+namespace LcGitLib2.GraphModel
 {
   /// <summary>
   /// An object that provides minimal information used construct Graph Nodes

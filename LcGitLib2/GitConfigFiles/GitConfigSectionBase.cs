@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace LcGitLib.GitConfigFiles
+namespace LcGitLib2.GitConfigFiles
 {
   /// <summary>
   /// Common base for GIT Config sections and subsections

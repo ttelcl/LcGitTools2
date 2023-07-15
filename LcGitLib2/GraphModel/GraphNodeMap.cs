@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
 
-namespace LcGitLib.GraphModel
+namespace LcGitLib2.GraphModel
 {
   /// <summary>
   /// A mapping from graph nodes (and graph node IDs) to some kind of value

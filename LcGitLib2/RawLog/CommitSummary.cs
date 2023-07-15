@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -10,11 +10,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.GraphModel;
+using LcGitLib2.GraphModel;
 
 using Newtonsoft.Json;
 
-namespace LcGitLib.RawLog
+namespace LcGitLib2.RawLog
 {
   /// <summary>
   /// Compacted variant of a raw CommitEntry

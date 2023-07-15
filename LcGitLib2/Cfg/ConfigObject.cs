@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 using Newtonsoft.Json.Linq;
 
-namespace LcGitLib.Cfg
+namespace LcGitLib2.Cfg
 {
   /// <summary>
   /// Wraps a JObject used to store settings

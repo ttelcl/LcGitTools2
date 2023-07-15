@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.FileUtilities
+namespace LcGitLib2.FileUtilities
 {
   /// <summary>
   /// Defines how to write multiple objects as JSON

@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -10,11 +10,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.Cfg;
-using LcGitLib.GitRunning;
-using LcGitLib.RepoTools;
+using LcGitLib2.Cfg;
+using LcGitLib2.GitRunning;
+using LcGitLib2.RepoTools;
 
-namespace LcGitLib.MetaBase
+namespace LcGitLib2.MetaBase
 {
   /// <summary>
   /// Degrees of cache file updates

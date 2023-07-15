@@ -1,11 +1,11 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
 using System.IO;
 
-namespace LcGitLib.FileUtilities
+namespace LcGitLib2.FileUtilities
 {
   /// <summary>
   /// Implements an IObserver that writes lines to a stream

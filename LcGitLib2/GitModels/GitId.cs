@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace LcGitLib.GitModels
+namespace LcGitLib2.GitModels
 {
   /// <summary>
   /// Represents a GIT identifier (expressed as a 40 character hex string)

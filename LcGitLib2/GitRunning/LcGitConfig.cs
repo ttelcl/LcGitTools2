@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace LcGitLib.GitRunning
+namespace LcGitLib2.GitRunning
 {
   /// <summary>
   /// Holds configuration information used by this library

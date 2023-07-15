@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.FileUtilities
+namespace LcGitLib2.FileUtilities
 {
   /// <summary>
   /// An IObserver that transforms incoming objects to other objects

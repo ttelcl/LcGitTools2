@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
 
-namespace LcGitLib.GitModels.Refs
+namespace LcGitLib2.GitModels.Refs
 {
   /// <summary>
   /// A node in a namespace tree of refs

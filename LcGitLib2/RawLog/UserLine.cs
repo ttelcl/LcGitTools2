@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace LcGitLib.RawLog
+namespace LcGitLib2.RawLog
 {
   /// <summary>
   /// A commit header line value refering to a user and a time stamp

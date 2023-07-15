@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -10,12 +10,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.Cfg;
-using LcGitLib.FileUtilities;
-using LcGitLib.GraphModel;
-using LcGitLib.RawLog;
+using LcGitLib2.Cfg;
+using LcGitLib2.FileUtilities;
+using LcGitLib2.GraphModel;
+using LcGitLib2.RawLog;
 
-namespace LcGitLib.GitRunning
+namespace LcGitLib2.GitRunning
 {
   /// <summary>
   /// Static methods running GIT and capturing the result somehow.

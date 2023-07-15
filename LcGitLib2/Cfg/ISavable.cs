@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LcGitLib.Cfg
+namespace LcGitLib2.Cfg
 {
   /// <summary>
   /// Something that can be saved and has a "dirty" flag

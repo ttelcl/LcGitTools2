@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.RawLog
+namespace LcGitLib2.RawLog
 {
   /// <summary>
   /// Conversions between full text Commit IDs and 8 byte numerical extract

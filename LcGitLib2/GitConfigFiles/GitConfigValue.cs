@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace LcGitLib.GitConfigFiles
+namespace LcGitLib2.GitConfigFiles
 {
   /// <summary>
   /// A key-value pair in a GIT config file. Beware that keys are not necessarily unique!

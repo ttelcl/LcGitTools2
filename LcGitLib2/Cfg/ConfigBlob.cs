@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace LcGitLib.Cfg
+namespace LcGitLib2.Cfg
 {
   /// <summary>
   /// A generic extensible, not-really-typed configuration blob, backed by

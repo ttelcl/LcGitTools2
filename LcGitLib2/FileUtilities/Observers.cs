@@ -1,8 +1,8 @@
 ﻿/*
- * (c) 2021  VTT / TTELCL
+ * (c) 2021  ttelcl / ttelcl
  */
 
-using LcGitLib.RawLog;
+using LcGitLib2.RawLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib.FileUtilities
+namespace LcGitLib2.FileUtilities
 {
   /// <summary>
   /// Static uitilities for instantiating various kinds of observers

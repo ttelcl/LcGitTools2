@@ -1,5 +1,5 @@
 ﻿/*
- * (c) 2021  VTT / ttelcl
+ * (c) 2021  ttelcl / ttelcl
  */
 
 using System;
@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LcGitLib.RawLog;
+using LcGitLib2.RawLog;
 
-namespace LcGitLib.GraphModel
+namespace LcGitLib2.GraphModel
 {
   /// <summary>
   /// A directed graph, built from nodes built from node seeds
