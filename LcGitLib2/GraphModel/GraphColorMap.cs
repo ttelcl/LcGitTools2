@@ -23,7 +23,7 @@ public class GraphColorMap<TId, TSeed>: GraphNodeMap<TId, int, TSeed>
   /// Create a new GraphColorMap
   /// </summary>
   public GraphColorMap(Graph<TId, TSeed> owner, int fillValue = 0)
-    : base(owner, false)
+    : base(owner)
   {
     foreach(var id in Owner.Ids)
     {
@@ -62,7 +62,7 @@ public class GraphColorMap<TId, TSeed>: GraphNodeMap<TId, int, TSeed>
       {
         this[id] = color;
         colored++;
-        var node = Owner[id];
+        var node = Owner.Get(id);
         foreach(var parent in expander(node))
         {
           stack.Push(parent.Id);
@@ -104,7 +104,7 @@ public class GraphColorMap<TId, TSeed>: GraphNodeMap<TId, int, TSeed>
       {
         this[id] = v | bitmask;
         colored++;
-        var node = Owner[id];
+        var node = Owner.Get(id);
         foreach(var parent in expander(node))
         {
           stack.Push(parent.Id);

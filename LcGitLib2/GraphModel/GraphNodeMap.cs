@@ -27,60 +27,29 @@ public class GraphNodeMap<TId, TValue>: IReadOnlyDictionary<TId, TValue>
   /// <summary>
   /// Create a new GraphNodeMap
   /// </summary>
-  public GraphNodeMap(
-    bool defaultWhenMissing)
+  public GraphNodeMap()
   {
     _values = new Dictionary<TId, TValue>();
-    DefaultWhenMissing = defaultWhenMissing;
   }
 
   /// <summary>
-  /// If true, retrieving a value that is not present returns the default for
-  /// TValue. If false, an exception is thrown instead.
-  /// </summary>
-  public bool DefaultWhenMissing { get; }
-
-  /// <summary>
-  /// Get the value for the given ID. This overload ignores the DefaultWhenMissing
-  /// flag, using an explicit flag instead.
-  /// </summary>
-  /// <param name="id">
-  /// The ID to lookup
-  /// </param>
-  /// <param name="defaultWhenMissing">
-  /// If true, retrieving a value that is not present returns the default for
-  /// TValue. If false, an exception is thrown instead.
-  /// </param>
-  public TValue this[TId id, bool defaultWhenMissing] {
-    get {
-      if(_values.TryGetValue(id, out var value))
-      {
-        return value;
-      }
-      else if(defaultWhenMissing)
-      {
-        return default(TValue);
-      }
-      else
-      {
-        throw new KeyNotFoundException(
-          $"Missing graph node key: {id}");
-      }
-    }
-  }
-
-  /// <summary>
-  /// Get or set the value for the given ID, using the missing value behaviour as
-  /// implied by DefaultWhenMissing.
+  /// Get or set the value for the given ID, throwing an exception when
+  /// trying to retrieve a missing value.
   /// </summary>
   /// <param name="id">
   /// The ID to lookup.
   /// </param>
   public TValue this[TId id] {
-    get => this[id, DefaultWhenMissing];
-    set {
-      _values[id] = value;
-    }
+    get => _values[id];
+    set => _values[id] = value;
+  }
+
+  /// <summary>
+  /// Try to get the value for the given ID, if available
+  /// </summary>
+  public bool TryGetValue(TId key, [MaybeNullWhen(false)] out TValue value)
+  {
+    return _values.TryGetValue(key, out value);
   }
 
   /// <summary>
@@ -115,14 +84,6 @@ public class GraphNodeMap<TId, TValue>: IReadOnlyDictionary<TId, TValue>
   }
 
   /// <summary>
-  /// Try to get the value for the given ID, if available
-  /// </summary>
-  public bool TryGetValue(TId key, [MaybeNullWhen(false)] out TValue value)
-  {
-    return _values.TryGetValue(key, out value);
-  }
-
-  /// <summary>
   /// Enumerate the key-value pairs in this map
   /// </summary>
   public IEnumerator<KeyValuePair<TId, TValue>> GetEnumerator()
@@ -134,15 +95,6 @@ public class GraphNodeMap<TId, TValue>: IReadOnlyDictionary<TId, TValue>
   {
     return GetEnumerator();
   }
-
-  // Nice try, but indexers cannot be generic themselves
-  //public TValue this<TSeed>[Graph<TSeed, TId>.Node node]
-  //  where TSeed : IGraphNodeSeed<TId>
-  //{
-  //  get {
-  //    return this[node.Id];
-  //  }
-  //}
 
 }
 
@@ -167,9 +119,8 @@ public class GraphNodeMap<TId, TValue, TSeed>:
   /// Create a new GraphNodeMap
   /// </summary>
   public GraphNodeMap(
-    Graph<TId, TSeed> owner,
-    bool defaultWhenMissing)
-    : base(defaultWhenMissing)
+    Graph<TId, TSeed> owner)
+    : base()
   {
     Owner = owner;
   }
@@ -180,7 +131,8 @@ public class GraphNodeMap<TId, TValue, TSeed>:
   public Graph<TId, TSeed> Owner { get; }
 
   /// <summary>
-  /// Get or set the value for the given node
+  /// Get or set the value for the given node, throwing an exception
+  /// when trying to get a missing value.
   /// </summary>
   public TValue this[Graph<TId, TSeed>.Node node] {
     get => this[node.Id];
@@ -190,10 +142,11 @@ public class GraphNodeMap<TId, TValue, TSeed>:
   }
 
   /// <summary>
-  /// Get the value for the given node, overriding the default DefaultWhenMissing mode
+  /// Try to get the value for the given node, if available
   /// </summary>
-  public TValue this[Graph<TId, TSeed>.Node node, bool defaultWhenMissing] {
-    get => this[node.Id, defaultWhenMissing];
+  public bool TryGetValue(Graph<TId, TSeed>.Node node, [MaybeNullWhen(false)] out TValue value)
+  {
+    return TryGetValue(node.Id, out value);
   }
 
   /// <summary>
@@ -202,14 +155,6 @@ public class GraphNodeMap<TId, TValue, TSeed>:
   public bool ContainsKey(Graph<TId, TSeed>.Node node)
   {
     return ContainsKey(node.Id);
-  }
-
-  /// <summary>
-  /// Try to get the value for the given node, if available
-  /// </summary>
-  public bool TryGetValue(Graph<TId, TSeed>.Node node, [MaybeNullWhen(false)] out TValue value)
-  {
-    return TryGetValue(node.Id, out value);
   }
 
   /// <summary>
@@ -233,9 +178,8 @@ public class GraphNodeSet<TId, TSeed>: GraphNodeMap<TId, Graph<TId, TSeed>.Node,
   /// Create a new empty GraphNodeSet
   /// </summary>
   public GraphNodeSet(
-    Graph<TId, TSeed> owner,
-    bool nullWhenMissing = false)
-    : base(owner, nullWhenMissing)
+    Graph<TId, TSeed> owner)
+    : base(owner)
   {
   }
 
@@ -249,15 +193,18 @@ public class GraphNodeSet<TId, TSeed>: GraphNodeMap<TId, Graph<TId, TSeed>.Node,
   /// <returns>
   /// The node that was actually inserted, or null if the argument was null.
   /// </returns>
-  public Graph<TId, TSeed>.Node Insert(Graph<TId, TSeed>.Node node)
+  public Graph<TId, TSeed>.Node? Insert(Graph<TId, TSeed>.Node? node)
   {
     if(node != null)
     {
       if(node.Owner != Owner)
       {
-        node = Owner[node.Id];
+        node = Owner.Find(node.Id);
       }
-      this[node.Id] = node;
+      if(node != null)
+      {
+        this[node.Id] = node;
+      }
     }
     return node;
   }
@@ -267,7 +214,7 @@ public class GraphNodeSet<TId, TSeed>: GraphNodeMap<TId, Graph<TId, TSeed>.Node,
   /// </summary>
   public Graph<TId, TSeed>.Node Insert(TId id)
   {
-    var node = Owner[id];
+    var node = Owner.Get(id);
     this[node.Id] = node;
     return node;
   }

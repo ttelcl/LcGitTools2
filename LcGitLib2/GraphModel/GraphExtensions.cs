@@ -27,21 +27,17 @@ public static class GraphExtensions
   /// <param name="graph">
   /// The graph for which to create a node set
   /// </param>
-  /// <param name="nullWhenMissing">
-  /// Set the behaviour when asking the resulting set for nodes it does not have.
-  /// </param>
   /// <param name="skipWhenMissing">
   /// The behaviour when mapping the input IDs to nodes in the graph
   /// </param>
   public static GraphNodeSet<TId, TSeed> ToSet<TId, TSeed>(
     this IEnumerable<TId> ids,
     Graph<TId, TSeed> graph,
-    bool nullWhenMissing = false,
     bool skipWhenMissing = false)
     where TSeed : IGraphNodeSeed<TId>
     where TId : IEquatable<TId>
   {
-    return ids.AddToSet(graph.NewSet(nullWhenMissing), skipWhenMissing);
+    return ids.AddToSet(graph.NewSet(), skipWhenMissing);
   }
 
   /// <summary>
@@ -128,7 +124,7 @@ public static class GraphExtensions
     {
       seeds.Reverse();
     }
-    return seeds.Select(seed => graph[seed.Id]).ToList();
+    return seeds.Select(seed => graph.Get(seed.Id)).ToList();
   }
 
 }

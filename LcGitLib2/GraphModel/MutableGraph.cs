@@ -81,16 +81,9 @@ public class MutableGraph<TId, TSeed>
   /// <summary>
   /// Lookup the node for the given ID, returning null if not found
   /// </summary>
-  public MutableNode this[TId id] {
+  public MutableNode? this[TId id] {
     get {
-      if(_nodes.TryGetValue(id, out var node))
-      {
-        return node;
-      }
-      else
-      {
-        return null;
-      }
+      return _nodes.TryGetValue(id, out var node) ? node : null;
     }
   }
 
@@ -309,7 +302,7 @@ public class MutableGraph<TId, TSeed>
     /// <summary>
     /// Find the parent node with the given ID, returning null if not found
     /// </summary>
-    public MutableNode Parent(TId id)
+    public MutableNode? Parent(TId id)
     {
       return _parents.FirstOrDefault(p => p.Id.Equals(id));
     }
@@ -317,7 +310,7 @@ public class MutableGraph<TId, TSeed>
     /// <summary>
     /// Find the child node with the given ID, returning null if not found
     /// </summary>
-    public MutableNode Child(TId id)
+    public MutableNode? Child(TId id)
     {
       return _children.FirstOrDefault(p => p.Id.Equals(id));
     }

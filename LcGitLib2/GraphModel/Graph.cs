@@ -32,7 +32,7 @@ public class Graph<TId, TSeed>
     IEnumerable<TSeed> seeds,
     bool allowPruning)
   {
-    _nodes = new GraphNodeSet<TId, TSeed>(this, false);
+    _nodes = new GraphNodeSet<TId, TSeed>(this);
     _nodesList = new List<Node>();
     Nodes = _nodesList.AsReadOnly();
     _roots = new List<Node>();
@@ -83,10 +83,21 @@ public class Graph<TId, TSeed>
   public int PrunedEdgeCount { get; private set; }
 
   /// <summary>
-  /// Find a node by ID.
+  /// Find a node by ID, returning null if not found
   /// </summary>
-  public Node this[TId id, bool nullIfMissing = false] {
-    get => _nodes[id, nullIfMissing];
+  public Node? Find(TId id)
+  {
+    return _nodes.TryGetValue(id, out var node) ? node : null;
+  }
+
+  /// <summary>
+  /// Get a node by ID, throwing an exception if not found
+  /// </summary>
+  public Node Get(TId id)
+  {
+    return _nodes.TryGetValue(id, out var node) 
+      ? node
+      : throw new KeyNotFoundException("graph key is missing");
   }
 
   /// <summary>
@@ -121,7 +132,7 @@ public class Graph<TId, TSeed>
   {
     foreach(var id in ids)
     {
-      var node = _nodes[id, skipMissing];
+      var node = skipMissing ? Find(id) : Get(id);
       if(node!=null)
       {
         yield return node;
@@ -132,17 +143,17 @@ public class Graph<TId, TSeed>
   /// <summary>
   /// Create a new, empty, GraphNodeSet
   /// </summary>
-  public GraphNodeSet<TId, TSeed> NewSet(bool nullWhenMissing = false)
+  public GraphNodeSet<TId, TSeed> NewSet()
   {
-    return new GraphNodeSet<TId, TSeed>(this, nullWhenMissing);
+    return new GraphNodeSet<TId, TSeed>(this);
   }
 
   /// <summary>
   /// Create a new, empty, GraphNodeMap for the given value type
   /// </summary>
-  public GraphNodeMap<TId, TValue, TSeed> NewMap<TValue>(bool defaultWhenMissing = false)
+  public GraphNodeMap<TId, TValue, TSeed> NewMap<TValue>()
   {
-    return new GraphNodeMap<TId, TValue, TSeed>(this, defaultWhenMissing);
+    return new GraphNodeMap<TId, TValue, TSeed>(this);
   }
 
   /// <summary>
