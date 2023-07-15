@@ -68,7 +68,7 @@ public abstract class ConfigView<T>
   /// <returns>
   /// The primitive value converted from raw value
   /// </returns>
-  protected abstract T ConvertValue(JToken jt);
+  protected abstract T ConvertValue(JToken? jt);
 
   /// <summary>
   /// Adapt a primitive value for insertion into the store
@@ -77,7 +77,7 @@ public abstract class ConfigView<T>
 
 }
 
-internal class StringConfigView: ConfigView<string>
+internal class StringConfigView: ConfigView<string?>
 {
   public StringConfigView(
     ConfigObject host,
@@ -86,7 +86,7 @@ internal class StringConfigView: ConfigView<string>
   {
   }
 
-  protected override JToken AdaptValue(string t)
+  protected override JToken AdaptValue(string? t)
   {
     if(t==null)
     {
@@ -98,7 +98,7 @@ internal class StringConfigView: ConfigView<string>
     }
   }
 
-  protected override string ConvertValue(JToken jt)
+  protected override string? ConvertValue(JToken? jt)
   {
     if(jt==null || jt.Type == JTokenType.Null)
     {
@@ -106,7 +106,54 @@ internal class StringConfigView: ConfigView<string>
     }
     else if(jt.Type == JTokenType.String)
     {
-      return (string)jt;
+      return (string?)jt;
+    }
+    else
+    {
+      throw new InvalidOperationException(
+        $"Expecting a string or null value but got a '{jt.Type}'");
+    }
+  }
+}
+
+internal class RequiredStringConfigView: ConfigView<string>
+{
+  public RequiredStringConfigView(
+    ConfigObject host)
+    : base(host, MissingBehaviour.Abort)
+  {
+  }
+
+  protected override JToken AdaptValue(string t)
+  {
+    if(t==null)
+    {
+      //return JValue.CreateNull();
+      throw new NotSupportedException(
+        "Expecting a non-null string");
+    }
+    else
+    {
+      return JValue.CreateString(t);
+    }
+  }
+
+  protected override string ConvertValue(JToken? jt)
+  {
+    if(jt==null || jt.Type == JTokenType.Null)
+    {
+      throw new NotSupportedException(
+        "Expecting a non-null string");
+    }
+    else if(jt.Type == JTokenType.String)
+    {
+      var value = (string?)jt;
+      if(value == null)
+      {
+        throw new NotSupportedException(
+          "Expecting a non-null string");
+      }
+      return value;
     }
     else
     {
@@ -137,7 +184,7 @@ internal class BoolConfigView: ConfigView<bool?>
     }
   }
 
-  protected override bool? ConvertValue(JToken jt)
+  protected override bool? ConvertValue(JToken? jt)
   {
     if(jt==null || jt.Type == JTokenType.Null)
     {
@@ -177,7 +224,7 @@ internal class LongConfigView: ConfigView<long?>
     }
   }
 
-  protected override long? ConvertValue(JToken jt)
+  protected override long? ConvertValue(JToken? jt)
   {
     if(jt == null || jt.Type == JTokenType.Null)
     {

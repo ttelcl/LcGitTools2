@@ -31,7 +31,7 @@ public class ConfigObject
     Label = label ?? "<root>";
     _content = content;
     Strings = new StringConfigView(this, false);
-    StringsRequired = new StringConfigView(this, true);
+    StringsRequired = new RequiredStringConfigView(this);
     Integers = new LongConfigView(this);
     Booleans = new BoolConfigView(this);
   }
@@ -76,7 +76,7 @@ public class ConfigObject
   /// <summary>
   /// Lookup or create a child ConfigObject (persisted as an object-valued property)
   /// </summary>
-  public ConfigObject Child(string name, MissingBehaviour missingBehaviour = MissingBehaviour.Abort)
+  public ConfigObject? Child(string name, MissingBehaviour missingBehaviour = MissingBehaviour.Abort)
   {
     var value = _content[name];
     if(value==null || value.Type == JTokenType.Null)
@@ -142,7 +142,7 @@ public class ConfigObject
       }
       else if(prop.Value is JObject jo)
       {
-        var child = Child(prop.Name, MissingBehaviour.Create);
+        var child = Child(prop.Name, MissingBehaviour.Create)!;
         child.Import(jo);
       }
       else
@@ -202,7 +202,7 @@ public class ConfigObject
   /// <returns>
   /// The value found, or null. JSON null values are returned as a C# null
   /// </returns>
-  public JToken this[string name, MissingBehaviour missingBehaviour = MissingBehaviour.ReturnNull] {
+  public JToken? this[string name, MissingBehaviour missingBehaviour = MissingBehaviour.ReturnNull] {
     get {
       var v = _content[name];
       if(v==null || v.Type == JTokenType.Null)
@@ -252,7 +252,7 @@ public class ConfigObject
   /// View the items as string valued, allowing missing or null values
   /// Items that are not null or a string cause an exception on read.
   /// </summary>
-  public ConfigView<string> Strings { get; }
+  public ConfigView<string?> Strings { get; }
 
   /// <summary>
   /// View the items as string valued, disallowing missing or null values

@@ -32,7 +32,7 @@ public class ConfigBlob: ISavable
   {
     BackingFile = Path.GetFullPath(backingFile);
     _content = new JObject();
-    Reload();
+    Root = Reload();
     ReadOnly = readOnly;
     if(ReadOnly && Dirty)
     {
@@ -41,7 +41,7 @@ public class ConfigBlob: ISavable
   }
 
   /// <summary>
-  /// The name of the backing file
+  /// The name of the backing file (full path)
   /// </summary>
   public string BackingFile { get; }
 
@@ -107,9 +107,10 @@ public class ConfigBlob: ISavable
   public ConfigObject Root { get; private set; }
 
   /// <summary>
-  /// Discard any changes and re-load the backing file if it exists
+  /// Discard any changes and re-load the backing file if it exists.
+  /// Returns the new <see cref="Root"/>
   /// </summary>
-  private void Reload()
+  private ConfigObject Reload()
   {
     if(File.Exists(BackingFile))
     {
@@ -123,6 +124,7 @@ public class ConfigBlob: ISavable
       Dirty = true;
     }
     Root = new ConfigObject(this, _content, null);
+    return Root;
   }
 
   /// <summary>
@@ -146,6 +148,11 @@ public class ConfigBlob: ISavable
     if(save)
     {
       var dir = Path.GetDirectoryName(BackingFile);
+      if(dir == null)
+      {
+        throw new InvalidOperationException(
+          "Internal error. Expecting directory to be well defined.");
+      }
       if(!Directory.Exists(dir))
       {
         Directory.CreateDirectory(dir);
@@ -227,7 +234,7 @@ public class ConfigBlob: ISavable
   /// View entries as nullable strings.
   /// Entries with a value that is not null or a string throw an exception on read.
   /// </summary>
-  public ConfigView<string> Strings { get => Root.Strings; }
+  public ConfigView<string?> Strings { get => Root.Strings; }
 
   /// <summary>
   /// View entries as nullable integers.
