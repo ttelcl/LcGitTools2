@@ -16,9 +16,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit tests", "Unit tests", "{2675084D-B759-4A3F-B944-2FEDCD71D6D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LcGitLib2", "LcGitLib2\LcGitLib2.csproj", "{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D1FBFBC0-D441-4822-BF5A-87AF2CB4ED1B} = {9A494B5B-84EE-4341-8FB7-0F1A444110DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F239D1D5-DFEA-4D52-A0D7-E78C923F45E0}
