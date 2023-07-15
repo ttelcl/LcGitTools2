@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ public class RefTreeNode
   /// <summary>
   /// Create a new RefTreeNode
   /// </summary>
-  internal RefTreeNode(string shortName, RefTreeNode parent)
+  internal RefTreeNode(string shortName, RefTreeNode? parent)
   {
     if(String.IsNullOrEmpty(shortName))
     {
@@ -49,7 +50,7 @@ public class RefTreeNode
   /// <summary>
   /// The parent node (possibly null)
   /// </summary>
-  public RefTreeNode Parent { get; init; }
+  public RefTreeNode? Parent { get; init; }
 
   /// <summary>
   /// The short name of this node (path excluded)
@@ -80,9 +81,9 @@ public class RefTreeNode
   /// The existing node, or the new node if it was created, or null
   /// if the node did not exist and <paramref name="create"/> was false.
   /// </returns>
-  public RefTreeNode GetChild(string name, bool create = false)
+  public RefTreeNode? GetChild(string name, bool create = false)
   {
-    if(_children.TryGetValue(name, out RefTreeNode child))
+    if(_children.TryGetValue(name, out var child))
     {
       return child;
     }
@@ -102,6 +103,17 @@ public class RefTreeNode
   }
 
   /// <summary>
+  /// Retrieve an existing direct child node or create a new one
+  /// </summary>
+  /// <param name="name">
+  /// The child node's name
+  /// </param>
+  /// <returns>
+  /// The existing node, or the new node if it was created.
+  /// </returns>
+  public RefTreeNode GetOrCreateChild(string name) => GetChild(name, true)!;
+
+  /// <summary>
   /// Test if this node's full name starts with the given prefix
   /// </summary>
   /// <param name="prefix">
@@ -114,7 +126,7 @@ public class RefTreeNode
   /// <returns>
   /// True if match, false otherwise
   /// </returns>
-  public bool HasPrefix(string prefix, out string tail)
+  public bool HasPrefix(string prefix, [NotNullWhen(true)] out string? tail)
   {
     if(FullName.StartsWith(prefix))
     {
@@ -199,13 +211,13 @@ public class RefTreeNode
     }
   }
 
-  internal void CopyChildClones(RefTreeNode model, Func<RefTreeNode, bool> condition)
+  internal void CopyChildClones(RefTreeNode model, Func<RefTreeNode, bool>? condition)
   {
     foreach(var modelChild in model.Children)
     {
-      if(condition != null && condition(modelChild))
+      if(condition == null || condition(modelChild))
       {
-        var child = GetChild(modelChild.ShortName, true);
+        var child = GetOrCreateChild(modelChild.ShortName);
         child.CopyChildClones(modelChild, condition);
       }
     }

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -41,7 +42,7 @@ public class RefTree: RefTreeNode
   public GitId? this[string path] {
     get => GetNode(path, false)?.Value;
     set {
-      GetNode(path, true).Value = value;
+      GetOrCreateNode(path).Value = value;
     }
   }
 
@@ -59,7 +60,7 @@ public class RefTree: RefTreeNode
   /// The node that was found or created, or null if not found and <paramref name="create"/>
   /// was false.
   /// </returns>
-  public RefTreeNode GetNode(string path, bool create = false)
+  public RefTreeNode? GetNode(string path, bool create = false)
   {
     if(String.IsNullOrEmpty(path))
     {
@@ -89,6 +90,18 @@ public class RefTree: RefTreeNode
   }
 
   /// <summary>
+  /// Get or create a node in the tree, given its full path
+  /// </summary>
+  /// <param name="path">
+  /// The full path of the node, which must start with "refs/"
+  /// </param>
+  /// <returns>
+  /// The node that was found or created.
+  /// was false.
+  /// </returns>
+  public RefTreeNode GetOrCreateNode(string path) => GetNode(path, true)!;
+
+  /// <summary>
   /// Enumerate all refs in the tree that have been assigned a value
   /// </summary>
   public IEnumerable<RefTreeNode> EnumerateAllValuedNodes()
@@ -112,11 +125,11 @@ public class RefTree: RefTreeNode
   /// True if the format of the line looked right and the data was inserted,
   /// false if the content wasn't recognized
   /// </returns>
-  public bool TryParseAndInsert(string line, out RefTreeNode node)
+  public bool TryParseAndInsert(string line, [NotNullWhen(true)] out RefTreeNode? node)
   {
     if(String.IsNullOrEmpty(line))
     {
-      node = null;
+      node = default;
       return false;
     }
     var m = Regex.Match(line, @"^([a-f0-9]{40})\s+(refs(/[^/]+)+)$");
@@ -124,7 +137,7 @@ public class RefTree: RefTreeNode
     {
       var id = new GitId(m.Groups[1].Value);
       var path = m.Groups[2].Value;
-      node = GetNode(path, true);
+      node = GetOrCreateNode(path);
       node.Value = id;
       return true;
     }
@@ -153,7 +166,7 @@ public class RefTree: RefTreeNode
   /// If not null: a filter that allows skipping parts of the tree.
   /// Only child nodes for which this returns true are copied.
   /// </param>
-  public RefTree Clone(Func<RefTreeNode, bool> condition = null)
+  public RefTree Clone(Func<RefTreeNode, bool>? condition = null)
   {
     var node = new RefTree();
     CopyChildClones(node, condition);

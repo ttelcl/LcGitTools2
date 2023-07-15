@@ -64,7 +64,7 @@ public readonly struct GitId: IEquatable<GitId>
   }
 
   /// <inheritdoc/>
-  public override bool Equals(object obj)
+  public override bool Equals(object? obj)
   {
     return obj is GitId id && Equals(id);
   }

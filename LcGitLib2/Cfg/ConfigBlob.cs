@@ -114,7 +114,7 @@ public class ConfigBlob: ISavable
     if(File.Exists(BackingFile))
     {
       var json = File.ReadAllText(BackingFile);
-      _content = JsonConvert.DeserializeObject<JObject>(json);
+      _content = JsonConvert.DeserializeObject<JObject>(json) ?? new JObject();
       Dirty = false;
     }
     else

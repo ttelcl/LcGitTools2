@@ -24,7 +24,7 @@ public class ConfigObject
   /// <summary>
   /// Create a new ConfigObject
   /// </summary>
-  internal ConfigObject(ISavable root, JObject content, string label)
+  internal ConfigObject(ISavable root, JObject content, string? label)
   {
     Root = root ?? new NotSavable();
     IsRoot = label == null;
