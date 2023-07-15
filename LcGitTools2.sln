@@ -7,7 +7,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CLI apps", "CLI apps", "{594C5497-6275-4FCA-AAA0-D2457C2F0E55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{9A494B5B-84EE-4341-8FB7-0F1A444110DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit tests", "Unit tests", "{2675084D-B759-4A3F-B944-2FEDCD71D6D9}"
 EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
