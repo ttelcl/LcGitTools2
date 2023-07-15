@@ -24,46 +24,20 @@ public class LcGitConfig
   /// </summary>
   private LcGitConfig(
     string gitPath,
-    string machineName,
-    string stageFolder,
-    string usbFolder,
     bool doCheck)
   {
     GitPath = gitPath;
-    MachineName = machineName;
-    StageFolder = stageFolder;
-    UsbFolder = usbFolder;
     if(doCheck)
     {
       if(String.IsNullOrEmpty(GitPath))
       {
         throw new InvalidOperationException(
-          $"Configuration error: GIT.exe configuration is missing");
+          $"Configuration error: 'git' executable configuration is missing");
       }
       if(!File.Exists(GitPath))
       {
         throw new InvalidOperationException(
-          $"Configuration error: GIT.exe not found at {GitPath}");
-      }
-      if(String.IsNullOrEmpty(MachineName))
-      {
-        throw new InvalidOperationException(
-          "No MachineName specified in configuration file");
-      }
-      if(String.IsNullOrEmpty(StageFolder))
-      {
-        throw new InvalidOperationException(
-          "No staging folder root has been configured yet");
-      }
-      if(!Directory.Exists(StageFolder))
-      {
-        throw new InvalidOperationException(
-          $"The configured stage folder root does not exist: {StageFolder}");
-      }
-      if(String.IsNullOrEmpty(UsbFolder))
-      {
-        throw new InvalidOperationException(
-          "No USB folder root has been configured yet");
+          $"Configuration error: configured 'git' executable not found at {GitPath}");
       }
     }
   }
@@ -72,11 +46,8 @@ public class LcGitConfig
   /// Create a new LcGitConfig and check its validity
   /// </summary>
   public LcGitConfig(
-    string gitPath,
-    string machineName,
-    string stageFolder,
-    string usbFolder)
-    : this(gitPath, machineName, stageFolder, usbFolder, true)
+    string gitPath)
+    : this(gitPath, true)
   {
   }
 
@@ -84,22 +55,6 @@ public class LcGitConfig
   /// The location of the git executable
   /// </summary>
   public string GitPath { get; }
-
-  /// <summary>
-  /// The name to use for this computer
-  /// </summary>
-  public string MachineName { get; }
-
-  /// <summary>
-  /// The folder holding the stage repositories
-  /// </summary>
-  public string StageFolder { get; }
-
-  /// <summary>
-  /// The path holding the USB repositories. By definition this points to a volatile
-  /// location: it may or may not be accessible
-  /// </summary>
-  public string UsbFolder { get; }
 
   private static string CalculateConfigFile()
   {
@@ -126,17 +81,25 @@ public class LcGitConfig
         throw new InvalidOperationException(
           $"The lcgitlib config file is missing: {ConfigFile}");
       }
-      return new LcGitConfig(
-        @"C:\Program Files\Git\cmd\git.exe",
-        Environment.MachineName,
-        "",
-        "",
-        doCheck);
+      throw new NotImplementedException(
+        "WIP: auto-initialization");
+      //return new LcGitConfig(
+      //  @"C:\Program Files\Git\cmd\git.exe",
+      //  Environment.MachineName,
+      //  "",
+      //  "",
+      //  doCheck);
     }
     else
     {
       var json = File.ReadAllText(ConfigFile);
-      return JsonConvert.DeserializeObject<LcGitConfig>(json);
+      var cfg = JsonConvert.DeserializeObject<LcGitConfig>(json);
+      if(cfg == null)
+      {
+        throw new InvalidOperationException(
+          "Bad configuration: Configuration file content deserialized to null.");
+      }
+      return cfg;
     }
   }
 

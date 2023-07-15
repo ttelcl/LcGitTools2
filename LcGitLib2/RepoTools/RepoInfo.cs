@@ -124,14 +124,14 @@ public class RepoInfoBase
 
   /// <summary>
   /// Return a string identifying the role of the repo if set, or
-  /// an empty string otherwise. Known roles are "stage" and "transfer"
+  /// an empty string otherwise.
   /// </summary>
   public string Role { get => HostObject.Strings["role"] ?? ""; }
 
-  /// <summary>
-  /// True if this repo is tagged as a stage repo
-  /// </summary>
-  public bool IsStage { get => Role == "stage"; }
+  ///// <summary>
+  ///// True if this repo is tagged as a stage repo
+  ///// </summary>
+  //public bool IsStage { get => Role == "stage"; }
 
   /// <summary>
   /// True if this repo is tagged as a transfer repo

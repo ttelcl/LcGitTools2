@@ -14,7 +14,6 @@ using LcGitLib2.Cfg;
 using LcGitLib2.GitConfigFiles;
 using LcGitLib2.GitRunning;
 using LcGitLib2.GraphModel;
-using LcGitLib2.MetaBase;
 using LcGitLib2.RawLog;
 
 namespace LcGitLib2.RepoTools;
@@ -24,13 +23,13 @@ namespace LcGitLib2.RepoTools;
 /// </summary>
 public class GitRepository
 {
-  private string _cachedLabel;
+  private string? _cachedLabel;
 
   /// <summary>
   /// Create a new GitRepository object, wrapping the repository with the given GIT folder.
   /// Consider using GitRepository.Locate() instead of this constructor
   /// </summary>
-  public GitRepository(string gitFolder, string label = null)
+  public GitRepository(string gitFolder, string? label = null)
   {
     _cachedLabel = label;
     gitFolder = Path.GetFullPath(gitFolder);
@@ -75,7 +74,7 @@ public class GitRepository
   /// Determines the behaviour when no GIT repository is found: if true, an exception
   /// is thrown; if false null is returned.
   /// </param>
-  public static GitRepository Locate(string anchorFolder, bool mustExist = true)
+  public static GitRepository? Locate(string anchorFolder, bool mustExist = true)
   {
     var gitFolder = RepoUtilities.FindGitFolder(anchorFolder);
     if(gitFolder==null)
@@ -114,7 +113,7 @@ public class GitRepository
   /// <summary>
   /// The main repository folder (working directory), or null for Bare repositories.
   /// </summary>
-  public string RepoFolder { get; }
+  public string? RepoFolder { get; }
 
   /// <summary>
   /// The repository label, derived from the folder name. It can also be set
@@ -133,14 +132,6 @@ public class GitRepository
     set {
       _cachedLabel = value;
     }
-  }
-
-  /// <summary>
-  /// Test if this repo appears to be inside the LcGitLib stage area
-  /// </summary>
-  public bool IsInStage()
-  {
-    return Stage.IsInStageArea(GitFolder) != null;
   }
 
   /// <summary>
@@ -264,10 +255,10 @@ public class GitRepository
     blob.Root
       .Set("founded", rootCommit.Author.ZonedTime)
       ;
-    if(Bare && IsInStage())
-    {
-      blob.Root.Set("role", "stage");
-    }
+    //if(Bare && IsInStage())
+    //{
+    //  blob.Root.Set("role", "stage");
+    //}
     blob.Save();
   }
 
