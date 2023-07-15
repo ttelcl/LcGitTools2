@@ -29,7 +29,7 @@ public static class GitOperations
   /// </summary>
   public static CommitEntry NewestEntry(
     this GitCommandHost host,
-    string startFolder = null)
+    string? startFolder = null)
   {
     startFolder = startFolder == null ? Environment.CurrentDirectory : Path.GetFullPath(startFolder);
     var cmd =
@@ -67,7 +67,7 @@ public static class GitOperations
   /// </summary>
   public static List<CommitEntry> RootEntries(
     this GitCommandHost host,
-    string startFolder = null)
+    string? startFolder = null)
   {
     startFolder = startFolder == null ? Environment.CurrentDirectory : Path.GetFullPath(startFolder);
     var cmd =
@@ -94,7 +94,7 @@ public static class GitOperations
   /// </summary>
   public static CommitGraph LoadGraph(
     this GitCommandHost host,
-    string startFolder = null)
+    string? startFolder = null)
   {
     startFolder = startFolder == null ? Environment.CurrentDirectory : Path.GetFullPath(startFolder);
     var cmd =
@@ -135,9 +135,10 @@ public static class GitOperations
   /// <returns></returns>
   public static SummaryGraph LoadSummaryGraph(
     this GitCommandHost host,
-    string startFolder = null,
+    string? startFolder = null,
     bool allowPruning = false)
   {
+    startFolder = startFolder == null ? Environment.CurrentDirectory : Path.GetFullPath(startFolder);
     var cmd =
       host
       .NewCommand(true)

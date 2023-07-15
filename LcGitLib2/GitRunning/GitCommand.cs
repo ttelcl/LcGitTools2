@@ -37,9 +37,9 @@ public class GitCommand
   public GitCommandHost Host { get; }
 
   /// <summary>
-  /// The main command
+  /// The main command (null while not yet initialized)
   /// </summary>
-  public string MainCommand { get; private set; }
+  public string? MainCommand { get; private set; }
 
   /// <summary>
   /// True if a command was set
@@ -49,7 +49,7 @@ public class GitCommand
   internal ProcessStartInfo BakeCommand(
     bool shellExecute = false)
   {
-    if(!HasCommand)
+    if(String.IsNullOrEmpty(MainCommand))
     {
       throw new InvalidOperationException(
         "no command was configured");
@@ -304,7 +304,7 @@ public class GitCommand
     if(HasCommand)
     {
       throw new InvalidOperationException(
-        $"Attempt to set mian command '{mainCommand}', but '{MainCommand}' was already set as command");
+        $"Attempt to set main command '{mainCommand}', but '{MainCommand!}' was already set as command");
     }
     MainCommand = mainCommand;
     return this;

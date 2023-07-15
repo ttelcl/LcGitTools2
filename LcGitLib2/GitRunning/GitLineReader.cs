@@ -43,7 +43,7 @@ public class GitLineReader
   /// <summary>
   /// Read the next line, returning null when done.
   /// </summary>
-  public string ReadLine(Stream source)
+  public string? ReadLine(Stream source)
   {
     var idx = FindFirst(0x0A);
     if(idx >= 0)
@@ -119,7 +119,7 @@ public class GitLineReader
   /// </summary>
   public IEnumerable<string> ReadLines(Stream source)
   {
-    string line;
+    string? line;
     while((line = ReadLine(source)) != null)
     {
       yield return line;

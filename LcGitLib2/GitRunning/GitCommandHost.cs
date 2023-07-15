@@ -27,7 +27,7 @@ public class GitCommandHost
   /// The library configuration object, or null to use the default as loaded from
   /// ~/.lcgitlib/lcgitlib.cfg.json or the hardcoded default if that file is missing.
   /// </param>
-  public GitCommandHost(IGitArgLogger argumentLogger, LcGitConfig configuration = null)
+  public GitCommandHost(IGitArgLogger argumentLogger, LcGitConfig? configuration = null)
   {
     ArgumentLogger = argumentLogger;
     Configuration = configuration ?? LcGitConfig.LoadDefault();
@@ -81,6 +81,11 @@ public class GitCommandHost
     ReportCall(psi);
     using(var process = Process.Start(psi))
     {
+      if(process == null)
+      {
+        throw new InvalidOperationException(
+          "Unexpected failure to start child process");
+      }
       if(terminateInput)
       {
         process.StandardInput.Close();
@@ -120,6 +125,11 @@ public class GitCommandHost
     ReportCall(psi);
     using(var process = Process.Start(psi))
     {
+      if(process == null)
+      {
+        throw new InvalidOperationException(
+          "Unexpected failure to start child process");
+      }
       if(terminateInput)
       {
         process.StandardInput.Close();
@@ -186,6 +196,11 @@ public class GitCommandHost
     {
       using(var process = Process.Start(psi))
       {
+        if(process == null)
+        {
+          throw new InvalidOperationException(
+            "Unexpected failure to start child process");
+        }
         if(terminateInput)
         {
           process.StandardInput.Close();
