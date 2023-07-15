@@ -16,13 +16,13 @@ namespace LcGitLib2.FileUtilities;
 /// </summary>
 public class CapturingObserver<T>: IObserver<T>
 {
-  private Func<T, bool> _filter;
+  private Func<T, bool>? _filter;
 
   /// <summary>
   /// Create a new CapturingObserver
   /// </summary>
   public CapturingObserver(
-    Func<T, bool> filter = null)
+    Func<T, bool>? filter = null)
   {
     CapturedItems = new List<T>();
     _filter = filter;
@@ -36,7 +36,7 @@ public class CapturingObserver<T>: IObserver<T>
   /// <summary>
   /// The most recent Exception sent to OnError (if any)
   /// </summary>
-  public Exception LastError { get; private set; }
+  public Exception? LastError { get; private set; }
 
   /// <summary>
   /// True if there was an error recorded

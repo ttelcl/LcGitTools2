@@ -49,7 +49,7 @@ public enum JsonMode
 /// </summary>
 public class JsonWritingObserver: IObserver<object>
 {
-  private string _previousItem;
+  private string? _previousItem;
 
   /// <summary>
   /// Create a new JsonWritingObserver
@@ -83,6 +83,7 @@ public class JsonWritingObserver: IObserver<object>
     switch(ext)
     {
       case ".json":
+      case ".jsonc":
         return JsonMode.JsonArrayIndent;
       case ".jsonl":
       case ".ljson":
