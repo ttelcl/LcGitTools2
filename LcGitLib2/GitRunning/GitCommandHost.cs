@@ -25,7 +25,7 @@ public class GitCommandHost
   /// </param>
   /// <param name="configuration">
   /// The library configuration object, or null to use the default as loaded from
-  /// ~/.lcgitlib/lcgitlib.cfg.json or the hardcoded default if that file is missing.
+  /// ~/.lcgitlib/lcgitlib.cfg.json or the default if that file is missing.
   /// </param>
   public GitCommandHost(IGitArgLogger? argumentLogger, LcGitConfig? configuration = null)
   {

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using LcGitLib2.GitRunning;
 
@@ -33,9 +34,9 @@ public class ConfigurationTests
   [Fact]
   public void CanRunGit()
   {
-    var cfg = LcGitConfig.GetDefault();
-    Assert.NotNull(cfg);
-    var host = new GitCommandHost(null, cfg);
+    //var cfg = LcGitConfig.GetDefault();
+    //Assert.NotNull(cfg);
+    var host = new GitCommandHost(null, null);
     var cmd =
       host.NewCommand()
       .WithoutCommand()
@@ -48,6 +49,37 @@ public class ConfigurationTests
     foreach(var line in lines)
     {
       _outputHelper.WriteLine($" -> '{line}'");
+    }
+  }
+
+  [Fact]
+  public void CanGetCommitMap()
+  {
+    var host = new GitCommandHost(null, null);
+    var commitMap = host.LoadCommitMap(/*@"k:\src\github\Newtonsoft.Json"*/);
+    Assert.NotNull(commitMap);
+    var missing = commitMap.MissingNodes.Select(n => n.Id.ShortId).ToList()!;
+    var roots = commitMap.Roots.Select(n => n.Id.ShortId).ToList()!;
+    var tips = commitMap.Tips.Select(n => n.Id.ShortId).ToList()!;
+    _outputHelper.WriteLine($"{missing.Count} Missing: {String.Join(", ", missing)}");
+    _outputHelper.WriteLine($"{roots.Count} Roots: {String.Join(", ", roots)}");
+    _outputHelper.WriteLine($"{tips.Count} Tips: {String.Join(", ", tips)}");
+    Assert.NotEmpty(roots);
+    Assert.NotEmpty(tips);
+
+    if(missing.Count > 0)
+    {
+      _outputHelper.WriteLine("pruning!");
+      var pruned = commitMap.PruneMissing();
+      missing = commitMap.MissingNodes.Select(n => n.Id.ShortId).ToList()!;
+      roots = commitMap.Roots.Select(n => n.Id.ShortId).ToList()!;
+      tips = commitMap.Tips.Select(n => n.Id.ShortId).ToList()!;
+      _outputHelper.WriteLine($"{missing.Count} Missing: {String.Join(", ", missing)}");
+      _outputHelper.WriteLine($"{roots.Count} Roots: {String.Join(", ", roots)}");
+      _outputHelper.WriteLine($"{tips.Count} Tips: {String.Join(", ", tips)}");
+      Assert.Empty(missing);
+      Assert.NotEmpty(roots);
+      Assert.NotEmpty(tips);
     }
   }
 }

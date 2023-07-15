@@ -83,15 +83,14 @@ public class LcGitConfig
   {
     if(!File.Exists(ConfigFile))
     {
-      if(doCheck)
-      {
-        throw new InvalidOperationException(
-          $"The lcgitlib config file is missing: {ConfigFile}");
-      }
+      //if(doCheck)
+      //{
+      //  throw new InvalidOperationException(
+      //    $"The lcgitlib config file is missing: {ConfigFile}");
+      //}
       var gitPath = LocateGitExecutable();
       if(gitPath == null)
       {
-        // TODO: save a template instead
         throw new InvalidOperationException(
           "Unable to locate the default git executable on this system");
       }

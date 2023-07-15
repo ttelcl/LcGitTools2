@@ -62,6 +62,35 @@ public static class GitOperations
   }
 
   /// <summary>
+  /// Build a <see cref="CommitMap"/> for the repository.
+  /// Consider checking <see cref="CommitMap.IsCompleted"/> if there were
+  /// commits missing.
+  /// </summary>
+  public static CommitMap LoadCommitMap(
+    this GitCommandHost host,
+    string? startFolder = null)
+  {
+    startFolder = startFolder == null ? Environment.CurrentDirectory : Path.GetFullPath(startFolder);
+    var cmd =
+      host
+      .NewCommand(true)
+      .AddPre("-C", startFolder)
+      .WithCommand("log")
+      .AddPost(/*"--branches", "--tags"*/ "--all", "--pretty=raw");
+    var commitMap = new CommitMap();
+    var sink =
+      new CommitMapObserver(commitMap)
+      .ObserveAsCommitEntries();
+    var status = host.RunToLineObserver(cmd, sink, true);
+    if(status != 0)
+    {
+      throw new InvalidOperationException(
+        $"git failed with status {status}");
+    }
+    return commitMap;
+  }
+
+  /// <summary>
   /// Return CommitEntries that do not have any parents.
   /// For most repositories this will return precisely 1 Commit entry
   /// </summary>

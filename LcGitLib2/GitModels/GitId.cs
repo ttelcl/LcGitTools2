@@ -43,6 +43,11 @@ public readonly struct GitId: IEquatable<GitId>
   public string Id { get; init; }
 
   /// <summary>
+  /// The abbreviated identifier
+  /// </summary>
+  public string ShortId => Id.Substring(0, 7);
+
+  /// <summary>
   /// Check if the string is a validly formatted GIT object id string
   /// </summary>
   public static bool IsValidId(string id)
