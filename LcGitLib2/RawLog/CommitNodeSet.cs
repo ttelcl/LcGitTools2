@@ -22,7 +22,7 @@ public class CommitNodeSet: ICollection<CommitNode>
   /// <summary>
   /// Create a new CommitNodeSet
   /// </summary>
-  internal CommitNodeSet(CommitGraph owner, IEnumerable<CommitNode> nodes = null)
+  internal CommitNodeSet(CommitGraph owner, IEnumerable<CommitNode>? nodes = null)
   {
     Owner = owner;
     _entries = new Dictionary<string, CommitNode>();

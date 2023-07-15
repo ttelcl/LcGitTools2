@@ -87,7 +87,7 @@ public class UserLine
   /// <summary>
   /// Returns true if the other UserLine is equivalent
   /// </summary>
-  public bool IsSame(UserLine other)
+  public bool IsSame(UserLine? other)
   {
     if(other == null)
     {

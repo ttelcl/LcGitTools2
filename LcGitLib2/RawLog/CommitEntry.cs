@@ -28,11 +28,11 @@ public class CommitEntry: IGraphNodeSeed<string>
   /// </summary>
   public CommitEntry(
     string commit,
-    string tree,
+    string? tree,
     IEnumerable<string> parents,
-    UserLine author,
-    UserLine committer,
-    Dictionary<string, string> other,
+    UserLine? author,
+    UserLine? committer,
+    Dictionary<string, string>? other,
     IEnumerable<string> message)
   {
     _parents = new List<string>(parents);
@@ -78,7 +78,7 @@ public class CommitEntry: IGraphNodeSeed<string>
   /// The tree ID string
   /// </summary>
   [JsonProperty("tree")]
-  public string TreeId { get; }
+  public string? TreeId { get; }
 
   /// <summary>
   /// The parent commit(s)
@@ -90,16 +90,16 @@ public class CommitEntry: IGraphNodeSeed<string>
   /// The commit author
   /// </summary>
   [JsonProperty("author")]
-  public UserLine Author { get; }
+  public UserLine? Author { get; }
 
   /// <summary>
   /// The committer (commit approver)
   /// </summary>
   [JsonProperty("committer")]
-  public UserLine Committer { get; }
+  public UserLine? Committer { get; }
 
   /// <summary>
-  /// Only serialize comitter if it is different from author
+  /// Only serialize committer if it is different from author
   /// </summary>
   public bool ShouldSerializeCommitter()
   {

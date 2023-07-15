@@ -66,7 +66,7 @@ public class CommitCsvAdapter: IObserver<CommitEntry>
         ce.Author == null ? "" : CsvUtilities.CsvQuote(ce.Author.User),
         ce.Committer == null ? "" : CsvUtilities.CsvQuote(ce.Committer.User),
         ce.Committer == null ? "" : ce.Committer.ZonedTime,
-        ce.TreeId.Substring(0, 8)
+        ce.TreeId != null ? ce.TreeId.Substring(0, 8) : ""
         );
     }
   }

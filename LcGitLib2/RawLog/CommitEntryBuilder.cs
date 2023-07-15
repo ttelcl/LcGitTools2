@@ -40,13 +40,13 @@ public class CommitEntryBuilder
 {
   private readonly List<string> _parents;
   private readonly List<string> _message;
-  private Dictionary<string, string> _other = null;
-  private string _commit;
-  private string _tree;
-  private string _author;
-  private string _committer;
-  private string _headerKey;
-  private string _headerValue;
+  private Dictionary<string, string>? _other = null;
+  private string? _commit;
+  private string? _tree;
+  private string? _author;
+  private string? _committer;
+  private string? _headerKey;
+  private string? _headerValue;
 
   private static char[] __splitter = new[] { ' ' };
 
@@ -81,8 +81,8 @@ public class CommitEntryBuilder
       throw new InvalidOperationException(
         "A CommitEntry parse was already in progress");
     }
-    string line;
-    while((line = source.ReadLine())!=null)
+    string? line;
+    while((line = source.ReadLine()) != null)
     {
       var ce = ProcessNextLine(line);
       if(ce!=null)
@@ -147,7 +147,7 @@ public class CommitEntryBuilder
   /// Process the next commit log line. Returns null while a parse is in
   /// progress, a CommitEntry when an entry is complete
   /// </summary>
-  public CommitEntry ProcessNextLine(string line)
+  public CommitEntry? ProcessNextLine(string line)
   {
     // Console.WriteLine($"**{State} [{line}]**");
     switch(State)
@@ -278,6 +278,14 @@ public class CommitEntryBuilder
       case CommitEntryBuilderState.BuildingMessage:
         throw new InvalidOperationException("Internal error, unexpected method call");
       case CommitEntryBuilderState.BuildingHeaders:
+        if(String.IsNullOrEmpty(_headerKey))
+        {
+          throw new InvalidOperationException("Invalid state: expecting a nonempty header key");
+        }
+        if(_headerValue == null)
+        {
+          throw new InvalidOperationException("Invalid state: expecting a non-null header value");
+        }
         AddHeader(_headerKey, _headerValue);
         _headerKey = null;
         _headerValue = null;

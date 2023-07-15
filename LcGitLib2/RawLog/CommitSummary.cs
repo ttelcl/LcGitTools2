@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using LcGitLib2.GraphModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LcGitLib2.RawLog;
 
@@ -27,10 +28,10 @@ public class CommitSummary: IGraphNodeSeed<long>
   public CommitSummary(
     string commit,
     string timeStamp,
-    string author,
+    string? author,
     string label,
     IEnumerable<long> parents,
-    string committer = null)
+    string? committer = null)
   {
     CommitId = commit;
     CommitTag = CommitId.AsCommitTag();
@@ -49,7 +50,8 @@ public class CommitSummary: IGraphNodeSeed<long>
   /// <summary>
   /// Convert a CommitEntry to a CommitSummary (the conversion is lossy, so not reversible)
   /// </summary>
-  public static CommitSummary FromEntry(CommitEntry e)
+  [return: NotNullIfNotNull("e")]
+  public static CommitSummary? FromEntry(CommitEntry? e)
   {
     if(e == null)
     {
@@ -114,20 +116,20 @@ public class CommitSummary: IGraphNodeSeed<long>
   /// The author
   /// </summary>
   [JsonProperty("author")]
-  public string Author { get; }
+  public string? Author { get; }
 
   /// <summary>
   /// The committer (only serialized when different from Author)
   /// </summary>
   [JsonProperty("committer")]
-  public string Committer { get; }
+  public string? Committer { get; }
 
   /// <summary>
-  /// Serialize committer only when different from author
+  /// Serialize committer only when different from author and not null
   /// </summary>
   public bool ShouldSerializeCommitter()
   {
-    return Committer != Author;
+    return Committer != Author && Committer != null;
   }
 
   /// <summary>
