@@ -25,13 +25,13 @@ public static class ConfigExtensions
    */
 
   /// <summary>
-  /// Set a key to a string value in the config object.
+  /// Set a key to a string value or null in the config object.
   /// Returns the config object to enable a fluent syntax.
   /// </summary>
   public static ConfigObject SetString(
     this ConfigObject target,
     string key,
-    string value)
+    string? value)
   {
     target.Strings[key] = value;
     return target;

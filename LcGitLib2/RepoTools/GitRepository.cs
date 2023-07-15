@@ -194,7 +194,7 @@ public class GitRepository
   /// <summary>
   /// Load the existing Repo Info object
   /// </summary>
-  public RepoInfo LoadInfo(bool mustExist = true)
+  public RepoInfo? LoadInfo(bool mustExist = true)
   {
     var blob = LcGitConfigFile("repo-info.json");
     if(!blob.Exists)
@@ -253,7 +253,7 @@ public class GitRepository
       1);
     // add additional info
     blob.Root
-      .Set("founded", rootCommit.Author.ZonedTime)
+      .SetString("founded", rootCommit.Author?.ZonedTime)
       ;
     //if(Bare && IsInStage())
     //{

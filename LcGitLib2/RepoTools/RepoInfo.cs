@@ -141,7 +141,7 @@ public class RepoInfoBase
   /// <summary>
   /// Access non-standard string properties
   /// </summary>
-  public string Other(string key, string defaultValue = null)
+  public string? Other(string key, string? defaultValue = null)
   {
     return HostObject.Strings[key] ?? defaultValue;
   }
