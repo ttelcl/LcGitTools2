@@ -22,7 +22,7 @@ public class GitCommand
   private readonly List<string> _postCommandArguments;
 
   /// <summary>
-  /// Create a new GitCommand
+  /// Create a new GitCommand. Called via <see cref="GitCommandHost.NewCommand(bool)"/>
   /// </summary>
   internal GitCommand(GitCommandHost host)
   {
@@ -42,6 +42,12 @@ public class GitCommand
   public string? MainCommand { get; private set; }
 
   /// <summary>
+  /// Indicates the call will have no main command. For example,
+  /// to run "git --version".
+  /// </summary>
+  public bool NoCommand { get; private set; }
+
+  /// <summary>
   /// True if a command was set
   /// </summary>
   public bool HasCommand { get => !String.IsNullOrEmpty(MainCommand); }
@@ -49,7 +55,7 @@ public class GitCommand
   internal ProcessStartInfo BakeCommand(
     bool shellExecute = false)
   {
-    if(String.IsNullOrEmpty(MainCommand))
+    if(String.IsNullOrEmpty(MainCommand) && !NoCommand)
     {
       throw new InvalidOperationException(
         "no command was configured");
@@ -60,7 +66,10 @@ public class GitCommand
     {
       psi.ArgumentList.Add(arg);
     }
-    psi.ArgumentList.Add(MainCommand);
+    if(MainCommand != null) // implies NoCommand == true
+    {
+      psi.ArgumentList.Add(MainCommand);
+    }
     foreach(var arg in _postCommandArguments)
     {
       psi.ArgumentList.Add(arg);
@@ -133,7 +142,7 @@ public class GitCommand
   /// </returns>
   public GitCommand AddPre(string argument)
   {
-    if(HasCommand)
+    if(HasCommand || NoCommand)
     {
       throw new InvalidOperationException(
         "This argument must be provided before the main command");
@@ -154,7 +163,7 @@ public class GitCommand
   /// </returns>
   public GitCommand AddPre(params string[] arguments)
   {
-    if(HasCommand)
+    if(HasCommand || NoCommand)
     {
       throw new InvalidOperationException(
         "These arguments must be provided before the main command");
@@ -199,7 +208,7 @@ public class GitCommand
   /// </returns>
   public GitCommand AddPost(string argument)
   {
-    if(!HasCommand)
+    if(!HasCommand && !NoCommand)
     {
       throw new InvalidOperationException(
         "This argument must be provided after the main command");
@@ -236,7 +245,7 @@ public class GitCommand
   /// </returns>
   public GitCommand AddPost(params string[] arguments)
   {
-    if(!HasCommand)
+    if(!HasCommand && !NoCommand)
     {
       throw new InvalidOperationException(
         "These arguments must be provided after the main command");
@@ -263,7 +272,7 @@ public class GitCommand
   /// </returns>
   public GitCommand AddPostIf(bool condition, params string[] arguments)
   {
-    if(!HasCommand)
+    if(!HasCommand && !NoCommand)
     {
       throw new InvalidOperationException(
         "These arguments must be provided after the main command");
@@ -301,12 +310,29 @@ public class GitCommand
   /// </returns>
   public GitCommand WithCommand(string mainCommand)
   {
-    if(HasCommand)
+    if(HasCommand || NoCommand)
     {
       throw new InvalidOperationException(
-        $"Attempt to set main command '{mainCommand}', but '{MainCommand!}' was already set as command");
+        $"Attempt to set main command '{mainCommand}', but '{MainCommand ?? "(none)"}' was already set as command");
     }
     MainCommand = mainCommand;
+    return this;
+  }
+
+  /// <summary>
+  /// Explicitly do not set a command, preventing a comand from being set
+  /// </summary>
+  /// <returns>
+  /// Returns this same object, for fluent calls.
+  /// </returns>
+  public GitCommand WithoutCommand()
+  {
+    if(HasCommand || NoCommand)
+    {
+      throw new InvalidOperationException(
+        $"Attempt to set no-main-command, but '{MainCommand ?? "(none)"}' was already set as command");
+    }
+    NoCommand = true; 
     return this;
   }
 

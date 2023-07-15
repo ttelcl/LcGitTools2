@@ -111,6 +111,27 @@ public class LcGitConfig
   }
 
   /// <summary>
+  /// Get the default instance from the cache, or create a new default.
+  /// This method ignores the configuration file.
+  /// </summary>
+  public static LcGitConfig GetDefault()
+  {
+    if(__default == null)
+    {
+      var gitPath = LocateGitExecutable();
+      if(gitPath == null)
+      {
+        throw new InvalidOperationException(
+          "Unable to locate the default git executable on this system");
+      }
+      __default = new LcGitConfig(gitPath, false);
+    }
+    return __default;
+  }
+
+  private static LcGitConfig? __default = null;
+
+  /// <summary>
   /// Search the git executable, without relying on our configuration file
   /// </summary>
   /// <returns>

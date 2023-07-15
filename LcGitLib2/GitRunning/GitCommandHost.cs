@@ -27,7 +27,7 @@ public class GitCommandHost
   /// The library configuration object, or null to use the default as loaded from
   /// ~/.lcgitlib/lcgitlib.cfg.json or the hardcoded default if that file is missing.
   /// </param>
-  public GitCommandHost(IGitArgLogger argumentLogger, LcGitConfig? configuration = null)
+  public GitCommandHost(IGitArgLogger? argumentLogger, LcGitConfig? configuration = null)
   {
     ArgumentLogger = argumentLogger;
     Configuration = configuration ?? LcGitConfig.LoadDefault();
@@ -44,9 +44,9 @@ public class GitCommandHost
   public string GitPath { get => Configuration.GitPath; }
 
   /// <summary>
-  /// The handler for logging arguments passed to GIT
+  /// The handler for logging arguments passed to GIT. Can be null.
   /// </summary>
-  public IGitArgLogger ArgumentLogger { get; set; }
+  public IGitArgLogger? ArgumentLogger { get; set; }
 
   /// <summary>
   /// If this is set to false, the environment variable "GIT_TERMINAL_PROMPT" will be set to 0
@@ -241,10 +241,7 @@ public class GitCommandHost
 
   private void ReportCall(ProcessStartInfo psi)
   {
-    if(ArgumentLogger != null)
-    {
-      ArgumentLogger.ReportArguments(psi);
-    }
+    ArgumentLogger?.ReportArguments(psi);
   }
 
 }

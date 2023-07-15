@@ -29,4 +29,25 @@ public class ConfigurationTests
     Assert.NotNull(gitPath);
     _outputHelper.WriteLine($"found GIT at: '{gitPath}'");
   }
+
+  [Fact]
+  public void CanRunGit()
+  {
+    var cfg = LcGitConfig.GetDefault();
+    Assert.NotNull(cfg);
+    var host = new GitCommandHost(null, cfg);
+    var cmd =
+      host.NewCommand()
+      .WithoutCommand()
+      .AddPost1("--version");
+    var lines = cmd.RunToLines(out var exitCode);
+    Assert.NotNull(lines);
+    Assert.True(lines.Count > 0);
+    Assert.Equal(0, exitCode);
+    _outputHelper.WriteLine($"Received {lines.Count} output lines");
+    foreach(var line in lines)
+    {
+      _outputHelper.WriteLine($" -> '{line}'");
+    }
+  }
 }
