@@ -9,26 +9,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcGitLib2.Cfg
+namespace LcGitLib2.Cfg;
+
+/// <summary>
+/// Options for behaviour when a requested item is missing
+/// </summary>
+public enum MissingBehaviour
 {
   /// <summary>
-  /// Options for behaviour when a requested item is missing
+  /// Return null if the item is missing
   /// </summary>
-  public enum MissingBehaviour
-  {
-    /// <summary>
-    /// Return null if the item is missing
-    /// </summary>
-    ReturnNull = 0,
+  ReturnNull = 0,
 
-    /// <summary>
-    /// Insert a new item and return that new item if it was missing
-    /// </summary>
-    Create = 1,
+  /// <summary>
+  /// Insert a new item and return that new item if it was missing
+  /// </summary>
+  Create = 1,
 
-    /// <summary>
-    /// Throw an exception if the item is missing
-    /// </summary>
-    Abort = 2,
-  }
+  /// <summary>
+  /// Throw an exception if the item is missing
+  /// </summary>
+  Abort = 2,
 }
