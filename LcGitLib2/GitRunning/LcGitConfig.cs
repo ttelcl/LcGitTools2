@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -58,19 +59,25 @@ public class LcGitConfig
 
   private static string CalculateConfigFile()
   {
-    var homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-    var cfgFolder = Path.Combine(homeFolder, ".lcgitlib");
-    return Path.Combine(cfgFolder, "lcgitlib.cfg.json");
+    var cfgFolder = Path.Combine(
+      Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+      ".lcgitlib2");
+    if(!Directory.Exists(cfgFolder))
+    {
+      Directory.CreateDirectory(cfgFolder);
+    }
+    return Path.Combine(cfgFolder, "lcgitlib2.gitconfig.json");
   }
 
   /// <summary>
-  /// The location where the configuration file is expected
+  /// The location where the user's LcGitLib2 configuration file is expected
   /// </summary>
   public static string ConfigFile { get; } = CalculateConfigFile();
 
   /// <summary>
   /// Load the default LcGitLib configuration, falling back to default
-  /// settings if the configuration file is missing
+  /// settings if the configuration file is missing. When falling back,
+  /// no new configuration is written.
   /// </summary>
   public static LcGitConfig LoadDefault(bool doCheck = true)
   {
@@ -81,14 +88,14 @@ public class LcGitConfig
         throw new InvalidOperationException(
           $"The lcgitlib config file is missing: {ConfigFile}");
       }
-      throw new NotImplementedException(
-        "WIP: auto-initialization");
-      //return new LcGitConfig(
-      //  @"C:\Program Files\Git\cmd\git.exe",
-      //  Environment.MachineName,
-      //  "",
-      //  "",
-      //  doCheck);
+      var gitPath = LocateGitExecutable();
+      if(gitPath == null)
+      {
+        // TODO: save a template instead
+        throw new InvalidOperationException(
+          "Unable to locate the default git executable on this system");
+      }
+      return new LcGitConfig(gitPath, doCheck);
     }
     else
     {
@@ -101,6 +108,49 @@ public class LcGitConfig
       }
       return cfg;
     }
+  }
+
+  /// <summary>
+  /// Search the git executable, without relying on our configuration file
+  /// </summary>
+  /// <returns>
+  /// The full path to the git executable if found, or null if not found
+  /// </returns>
+  public static string? LocateGitExecutable()
+  {
+    if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+      return SearchInPath("git.exe");
+    }
+    else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+      || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+    {
+      return SearchInPath("git");
+    }
+    else
+    {
+      throw new InvalidOperationException(
+        "Unrecognized operating system - don't know how to locate the git executable");
+    }
+  }
+
+  private static string? SearchInPath(string targetFile)
+  {
+    var path = Environment.GetEnvironmentVariable("PATH");
+    if(path == null)
+    {
+      throw new InvalidOperationException("Cannot access PATH");
+    }
+    var pathfolders = path.Split(Path.PathSeparator);
+    foreach(var pathfolder in pathfolders)
+    {
+      var fnm = Path.Combine(pathfolder, targetFile);
+      if(File.Exists(fnm))
+      {
+        return fnm;
+      }
+    }
+    return null;
   }
 
 }
