@@ -26,8 +26,8 @@ public class GitConfigSection: GitConfigSectionBase
   /// </summary>
   public GitConfigSection(
     string section,
-    IEnumerable<GitConfigValue> values = null,
-    IReadOnlyDictionary<string, GitConfigSubsection> subsections = null)
+    IEnumerable<GitConfigValue>? values = null,
+    IReadOnlyDictionary<string, GitConfigSubsection>? subsections = null)
     : base(section, values)
   {
     _subsections = new Dictionary<string, GitConfigSubsection>(StringComparer.InvariantCulture);
@@ -66,7 +66,7 @@ public class GitConfigSection: GitConfigSectionBase
   /// <summary>
   /// Find a subsection by name, optionally creating a blank one
   /// </summary>
-  public GitConfigSubsection FindSubsection(string subsection, bool create = false)
+  public GitConfigSubsection? FindSubsection(string subsection, bool create = false)
   {
     if(!_subsections.TryGetValue(subsection, out var gcss))
     {
@@ -82,6 +82,11 @@ public class GitConfigSection: GitConfigSectionBase
     }
     return gcss;
   }
+
+  /// <summary>
+  /// Find a subsection by name, creating a blank one if not found
+  /// </summary>
+  public GitConfigSubsection FindOrCreateSubsection(string subsection) => FindSubsection(subsection, true)!;
 
 
   /// <summary>

@@ -81,7 +81,7 @@ public class GitConfigValue
   /// Parse a value line, returning the parsed GitConfigValue, or null if
   /// the line was whitespace-only or a comment
   /// </summary>
-  public static GitConfigValue Parse(string line)
+  public static GitConfigValue? Parse(string line)
   {
     if(String.IsNullOrEmpty(line))
     {

@@ -24,7 +24,7 @@ public abstract class GitConfigSectionBase
   /// <summary>
   /// Create a new GitConfigSectionBase
   /// </summary>
-  protected GitConfigSectionBase(string section, IEnumerable<GitConfigValue> values = null)
+  protected GitConfigSectionBase(string section, IEnumerable<GitConfigValue>? values = null)
   {
     _values = new List<GitConfigValue>();
     Values = _values.AsReadOnly();
@@ -69,7 +69,7 @@ public abstract class GitConfigSectionBase
   /// <summary>
   /// Parse the value line and add it if it isn't blank
   /// </summary>
-  public GitConfigValue AddLine(string line)
+  public GitConfigValue? AddLine(string line)
   {
     var gcv = GitConfigValue.Parse(line);
     if(gcv != null)
@@ -93,7 +93,7 @@ public abstract class GitConfigSectionBase
   /// Find the single value for key. Raise an exception if there are multiple
   /// results, or when there are none and the 'optional' flag is not set.
   /// </summary>
-  public string FindValue(string key, bool optional = false)
+  public string? FindValue(string key, bool optional = false)
   {
     var values = FindValues(key).ToList();
     if(values.Count>1)
@@ -110,12 +110,18 @@ public abstract class GitConfigSectionBase
   }
 
   /// <summary>
+  /// Find the single value for key. Raise an exception if there are multiple
+  /// results, or when there are none.
+  /// </summary>
+  public string GetValue(string key) => FindValue(key, false)!;
+
+  /// <summary>
   /// Find the single boolean value for the given key, raising an exception
   /// if there are no values or multiple values
   /// </summary>
   public bool FindBoolean(string key)
   {
-    return GitConfigValue.ToBool(FindValue(key, false));
+    return GitConfigValue.ToBool(GetValue(key));
   }
 
   /// <summary>

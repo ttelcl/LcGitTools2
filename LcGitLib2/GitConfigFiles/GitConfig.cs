@@ -27,7 +27,7 @@ public class GitConfig
   /// <summary>
   /// Create a new GitConfig
   /// </summary>
-  public GitConfig(IReadOnlyDictionary<string, GitConfigSection> sections = null)
+  public GitConfig(IReadOnlyDictionary<string, GitConfigSection>? sections = null)
   {
     _sections = new Dictionary<string, GitConfigSection>(StringComparer.InvariantCultureIgnoreCase);
     Sections = _sections;
@@ -59,7 +59,7 @@ public class GitConfig
   /// <summary>
   /// Find a section, optionally creating it
   /// </summary>
-  public GitConfigSection FindSection(string section, bool create = false)
+  public GitConfigSection? FindSection(string section, bool create = false)
   {
     if(!_sections.TryGetValue(section, out var gcs))
     {
@@ -81,9 +81,14 @@ public class GitConfig
   }
 
   /// <summary>
+  /// Find a section, creating it if it did not yet exist
+  /// </summary>
+  public GitConfigSection FindOrCreateSection(string section) => FindSection(section, true)!;
+
+  /// <summary>
   /// Find a subsection, optionally creating it and its containing section
   /// </summary>
-  public GitConfigSubsection FindSubsection(string section, string subsection, bool create = false)
+  public GitConfigSubsection? FindSubsection(string section, string subsection, bool create = false)
   {
     var gcs = FindSection(section, create);
     if(gcs==null)
@@ -95,12 +100,18 @@ public class GitConfig
   }
 
   /// <summary>
+  /// Find a subsection, optionally creating it and its containing section
+  /// </summary>
+  public GitConfigSubsection FindOrCreateSubsection(string section, string subsection) 
+    => FindSubsection(section, subsection, true)!;
+
+  /// <summary>
   /// Parse lines from a config file and insert them into this config object, 
   /// creating new sections and subsections and/or extending existing ones.
   /// </summary>
   public void ParseLines(IEnumerable<string> lines)
   {
-    GitConfigSectionBase currentSection = null;
+    GitConfigSectionBase? currentSection = null;
     foreach(var line in lines)
     {
       if(!String.IsNullOrWhiteSpace(line)) // else: ignore blank line
@@ -144,11 +155,11 @@ public class GitConfig
           }
           if(subsectionName==null)
           {
-            currentSection = FindSection(sectionName, true);
+            currentSection = FindOrCreateSection(sectionName);
           }
           else
           {
-            currentSection = FindSubsection(sectionName, subsectionName, true);
+            currentSection = FindOrCreateSubsection(sectionName, subsectionName);
           }
         }
         else if(line[0] == '#' || line[0] == ';')
@@ -189,14 +200,14 @@ public class GitConfig
   /// Return the 'bare' flag in the 'core' section
   /// </summary>
   [JsonIgnore]
-  public bool IsBare { get => FindSection("core").FindBoolean("bare"); }
+  public bool IsBare { get => FindOrCreateSection("core").FindBoolean("bare"); }
 
   /// <summary>
   /// Return a map from remotes to their URLs
   /// </summary>
-  public Dictionary<string, string> RemoteUrls()
+  public Dictionary<string, string?> RemoteUrls()
   {
-    var map = new Dictionary<string, string>();
+    var map = new Dictionary<string, string?>();
     var remotes = FindSection("remote");
     if(remotes!=null)
     {

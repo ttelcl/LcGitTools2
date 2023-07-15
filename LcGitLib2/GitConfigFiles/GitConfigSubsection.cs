@@ -27,7 +27,7 @@ public class GitConfigSubsection: GitConfigSectionBase
   public GitConfigSubsection(
     string section,
     string subsection,
-    IEnumerable<GitConfigValue> values = null)
+    IEnumerable<GitConfigValue>? values = null)
     : base(section, values)
   {
     Subsection = subsection;
