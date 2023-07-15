@@ -15,7 +15,7 @@ using LcGitLib2.Cfg;
 namespace LcGitLib2.RepoTools;
 
 /// <summary>
-/// Description of RepoUtilities
+/// Utilities related to GIT repository folders
 /// </summary>
 public static class RepoUtilities
 {
@@ -31,7 +31,12 @@ public static class RepoUtilities
   /// Returns a ".git" folder for full repositories, or the "xxxxx.git" bare
   /// repository folder for bare repositories.
   /// </returns>
-  public static string FindGitFolder(string startFolder)
+  public static string? FindGitFolder(string startFolder)
+  {
+    return FindGitFolderInternal(startFolder);
+  }
+
+  private static string? FindGitFolderInternal(string? startFolder)
   {
     if(String.IsNullOrEmpty(startFolder)) // terminate recursion
     {
@@ -66,16 +71,17 @@ public static class RepoUtilities
       return gitFolder;
     }
     // Trick alert: Path.GetDirectoryName(@"C:\") returns null
-    return FindGitFolder(Path.GetDirectoryName(startFolder));
+    return FindGitFolderInternal(Path.GetDirectoryName(startFolder));
   }
 
   /// <summary>
   /// Get a label for the repo, based on the name of the repo folder or
-  /// the git folder in case of bare repos
+  /// the git folder in case of bare repos. Returns null if there
+  /// doesn't seem to be a git repo at all.
   /// </summary>
-  public static string RepoLabel(string startFolder)
+  public static string? RepoLabel(string startFolder)
   {
-    var gitFolder = FindGitFolder(startFolder);
+    var gitFolder = FindGitFolderInternal(startFolder);
     if(gitFolder==null)
     {
       return null;
@@ -98,11 +104,12 @@ public static class RepoUtilities
   }
 
   /// <summary>
-  /// Find the GIT config file for the repository the search anchor is in
+  /// Find the GIT config file for the repository the search anchor is in.
+  /// Returns null if not found.
   /// </summary>
-  public static string FindGitConfigFile(string searchAnchorFolder)
+  public static string? FindGitConfigFile(string searchAnchorFolder)
   {
-    var gitFolder = FindGitFolder(searchAnchorFolder);
+    var gitFolder = FindGitFolderInternal(searchAnchorFolder);
     if(gitFolder==null)
     {
       return null;
@@ -166,7 +173,7 @@ public static class RepoUtilities
     }
     // While this looks more complex than necessary, this handles boundary cases
     // correctly. In particular, it does not strip the separator after "C:\"
-    return Path.GetDirectoryName(Path.Combine(Path.GetFullPath(folder), "x"));
+    return Path.GetDirectoryName(Path.Combine(Path.GetFullPath(folder), "x"))!;
   }
 
 }

@@ -124,8 +124,12 @@ public class GitRepository
     get {
       if(String.IsNullOrEmpty(_cachedLabel))
       {
-        var info = this.LoadInfo(false);
-        _cachedLabel = info?.Label ?? RepoUtilities.RepoLabel(GitFolder);
+        _cachedLabel = RepoUtilities.RepoLabel(GitFolder);
+        if(_cachedLabel == null)
+        {
+          throw new InvalidOperationException(
+            "Unable to determine the repository label");
+        }
       }
       return _cachedLabel;
     }
@@ -189,77 +193,6 @@ public class GitRepository
   public SummaryGraph LoadSummaryGraph(GitCommandHost commandHost, bool allowPruning = false)
   {
     return commandHost.LoadSummaryGraph(GitFolder, allowPruning);
-  }
-
-  /// <summary>
-  /// Load the existing Repo Info object
-  /// </summary>
-  public RepoInfo? LoadInfo(bool mustExist = true)
-  {
-    var blob = LcGitConfigFile("repo-info.json");
-    if(!blob.Exists)
-    {
-      if(!mustExist)
-      {
-        return null;
-      }
-      throw new InvalidOperationException(
-        "This repo has not been initialized for lcgitlib use yet (file missing).");
-    }
-    if(!RepoInfo.IsInitialized(blob.Root))
-    {
-      if(!mustExist)
-      {
-        return null;
-      }
-      throw new InvalidOperationException(
-        "This repo has not been initialized for lcgitlib use yet (incompatible content).");
-    }
-    return new RepoInfo(blob);
-  }
-
-  /// <summary>
-  /// Initialize the repo info file. Fails if already done so
-  /// </summary>
-  public void InitializeRepoInfo(GitCommandHost commandHost)
-  {
-    var blob = LcGitConfigFile("repo-info.json");
-    if(blob.Exists)
-    {
-      throw new InvalidOperationException(
-        "This repo has already been initialized for lcgitlib use yet (file exists).");
-    }
-    var roots = commandHost.RootEntries(GitFolder);
-    if(roots.Count>1)
-    {
-      throw new NotSupportedException(
-        "This repository has multiple root commits, which is not yet supported by lcgitlib");
-    }
-    if(roots.Count < 1)
-    {
-      throw new NotSupportedException(
-        "This repository is empty; it does not have a root commit to identify it");
-    }
-    var rootCommit = roots[0];
-    var location = RepoFolder ?? GitFolder;
-    var label = Label;
-    RepoInfo.InitializeNew(
-      blob,
-      location,
-      label,
-      rootCommit.CommitId,
-      RandomId.NewId(12),
-      Bare,
-      1);
-    // add additional info
-    blob.Root
-      .SetString("founded", rootCommit.Author?.ZonedTime)
-      ;
-    //if(Bare && IsInStage())
-    //{
-    //  blob.Root.Set("role", "stage");
-    //}
-    blob.Save();
   }
 
 }
