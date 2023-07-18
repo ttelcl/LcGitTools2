@@ -129,7 +129,7 @@ public class GitBupRepo
   /// Change the target folder to a predefined folder locally inside
   /// the repository.
   /// </summary>
-  public void ChangeTargetLocal()
+  public string ChangeTargetLocal()
   {
     var configFolder = Path.GetDirectoryName(_repoConfig.FileName);
     if(!Directory.Exists(configFolder))
@@ -143,6 +143,7 @@ public class GitBupRepo
       Directory.CreateDirectory(targetFolder);
     }
     ChangeTargetFull(targetFolder);
+    return targetFolder;
   }
 
   /// <summary>

@@ -26,6 +26,8 @@ let runName args =
     | "-v" :: rest ->
       verbose <- true
       rest |> parseMore o
+    | "-h" :: _ ->
+      None
     | "-C" :: path :: rest ->
       rest |> parseMore {o with RepoPath = path}
     | "-list" :: rest
