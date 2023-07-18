@@ -20,6 +20,7 @@ type private FolderOptions = {
   Command: FolderCommand
 }
 
+
 let runFolder args =
   let rec parseMore o args =
     match args with
