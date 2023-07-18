@@ -23,6 +23,7 @@ let usage detail =
   cp ""
   cp "\fogitbup name\f0 [\fg-show\f0|\fg-set \fc<name>\f0|\fg-default\f0]"
   cp "   Manage the name for this repository (determining folder and file names)"
+  cp "   \fg-show\f0       Show the current name"
   cp "   \fg-default\f0    Reset the name to the default, based on the repo folder name."
   cp "   \fg-set\f0        Change the name"
   cp ""

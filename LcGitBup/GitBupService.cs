@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 using LcGitBup.Configuration;
 
+using LcGitLib2.RepoTools;
+
 namespace LcGitBup;
 
 /// <summary>
@@ -136,4 +138,12 @@ public class GitBupService
   /// The name of the configuration file
   /// </summary>
   public string ConfigurationFile => _globalConfig.FileName;
+
+  /// <summary>
+  /// Create a new <see cref="GitBupRepo"/> instance
+  /// </summary>
+  public GitBupRepo GetRepo(GitRepository repo)
+  {
+    return new GitBupRepo(this, repo);
+  }
 }

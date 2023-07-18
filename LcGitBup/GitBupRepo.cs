@@ -52,7 +52,7 @@ public class GitBupRepo
   /// <summary>
   /// The repository name used for gitbup: the configured name, or the
   /// default if there is no configuration yet.
-  /// Use <see cref="Changelabel(string)"/> to modify.
+  /// Use <see cref="ChangeLabel(string)"/> to modify.
   /// </summary>
   public string RepoLabel => HasConfig ? _repoConfig.Content!.RepoName : Repository.Label;
 
@@ -177,7 +177,7 @@ public class GitBupRepo
   /// <summary>
   /// Change the label used by gitbup.exe for this repository
   /// </summary>
-  public void Changelabel(string newLabel)
+  public void ChangeLabel(string newLabel)
   {
     if(String.IsNullOrEmpty(newLabel)
       || newLabel.IndexOfAny("\\/:;'\"".ToCharArray())>=0)
