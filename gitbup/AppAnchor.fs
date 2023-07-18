@@ -15,7 +15,7 @@ type private AnchorCommand =
 
 type private AnchorOptions = {
   RepoPath: string
-  Command: AnchorCommand option
+  Command: AnchorCommand
 }
 
 let private runSetAnchor tag folder =
@@ -60,28 +60,24 @@ let runAnchor args =
       rest |> parseMore {o with RepoPath = path}
     | "-list" :: rest
     | "-show" :: rest ->
-      rest |> parseMore {o with Command = Some(CmdShow)}
+      rest |> parseMore {o with Command = CmdShow}
     | "-set" :: tag :: folder :: rest ->
-      rest |> parseMore {o with Command = Some(CmdSet(tag, folder))}
+      rest |> parseMore {o with Command = CmdSet(tag, folder)}
     | [] ->
-      if o.Command.IsNone then
-        failwith "No 'anchor' subcommand specified"
       Some(o)
     | x :: _ ->
       failwith $"Unrecognized argument: '{x}'"
   let oo = args |> parseMore {
     RepoPath = null
-    Command = None
+    Command = CmdShow
   }
   match oo with
   | Some(o) ->
     match o.Command with
-    | Some(CmdShow) ->
+    | CmdShow ->
       runListAnchor()
-    | Some(CmdSet(tag, folder)) ->
+    | CmdSet(tag, folder) ->
       runSetAnchor tag folder
-    | None ->
-      failwith "No subcommand specified"
   | None ->
     Usage.usage "anchor"
     0

@@ -19,8 +19,7 @@ let rec run arglist =
     0  // program return status code to the operating system; 0 == "OK"
   | "run" :: rest ->
     rest |> AppRun.runRun
-  | "anchors" :: rest ->
-    "-list" :: rest |> AppAnchor.runAnchor
+  | "anchors" :: rest
   | "anchor" :: rest ->
     rest |> AppAnchor.runAnchor
   | "target" :: rest
