@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LcGitBup\LcGitBup.csproj" />
     <ProjectReference Include="..\LcGitLib2\LcGitLib2.csproj" />
   </ItemGroup>
 

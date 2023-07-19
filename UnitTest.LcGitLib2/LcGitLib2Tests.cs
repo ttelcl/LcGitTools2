@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 
-using LcGitLib2.GitRunning;
-
 using Xunit;
 using Xunit.Abstractions;
+
+using LcGitLib2.GitRunning;
 
 namespace UnitTest.LcGitLib2;
 

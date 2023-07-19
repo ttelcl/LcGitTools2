@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LcGitBup.BundleModel;
@@ -20,6 +22,24 @@ public class GitBupBundle
   /// <summary>
   /// Create a new GitBupBundle
   /// </summary>
+  /// <param name="folder">
+  /// The folder in which the bundle exists (or will exist)
+  /// </param>
+  /// <param name="prefix">
+  /// The prefix of the file name, indicating the repository
+  /// </param>
+  /// <param name="tier">
+  /// The backup tier. 0 indicates a full backup, higher numbers indicate
+  /// an incremental backup referencing a previous tier backup.
+  /// </param>
+  /// <param name="id">
+  /// The backup identifier, which is derived from a UTC timestamp in "yyyyMMdd-HHmmss" form
+  /// </param>
+  /// <param name="refId">
+  /// The id of the referenced bundle. This must be "-" for a tier 0 bundle,
+  /// or a UTC timestamp in "yyyyMMdd-HHmmss" form otherwise.
+  /// </param>
+  /// <exception cref="ArgumentOutOfRangeException"></exception>
   public GitBupBundle(
     string folder,
     string prefix,
@@ -31,15 +51,57 @@ public class GitBupBundle
     Prefix = prefix;
     Tier = tier;
     Id = id;
-    RefId = refId;
+    RefId = String.IsNullOrEmpty(refId) ? null : refId; // normalize "" to null
     var refId2 = String.IsNullOrEmpty(RefId) ? "-" : RefId;
     BundleFileName = $"{Prefix}.{Id}.{refId2}.t{Tier}.bundle";
     MetaFileName = BundleFileName + ".meta.json";
+    if(!IsValidId(id))
+    {
+      throw new ArgumentOutOfRangeException(
+        nameof(id), $"The id ({id}) is not in the expected format");
+    }
+    if(!String.IsNullOrEmpty(refId))
+    {
+      if(!IsValidId(refId))
+      {
+        throw new ArgumentOutOfRangeException(
+          nameof(refId), $"The reference id ({refId}) is not in the expected format");
+      }
+      if(StringComparer.InvariantCultureIgnoreCase.Compare(id, refId) <= 0)
+      {
+        throw new ArgumentOutOfRangeException(
+          nameof(refId),
+          $"The reference id ({refId}) is expected to be older than the own id ({id})");
+      }
+      if(Tier == 0)
+      {
+        throw new ArgumentOutOfRangeException(
+          nameof(refId), $"Expecting the reference id to be '-' for a tier 0 bundle");
+      }
+    }
   }
 
+  /// <summary>
+  /// Build a GitBupBundle by parsing a bundle file name
+  /// </summary>
+  /// <param name="fileName">
+  /// The bundle file name to parse. The directory part is used
+  /// to derive the <see cref="Folder"/> property, so that should
+  /// not be omitted.
+  /// </param>
+  /// <returns>
+  /// A new <see cref="GitBupBundle"/> instance if successful, or null
+  /// if the name did not match requirements
+  /// </returns>
   public static GitBupBundle? FromBundleName(string fileName)
   {
-    var shortName = Path.GetFileName(fileName);
+    if(String.IsNullOrEmpty(fileName))
+    {
+      return null;
+    }
+    var fullName = Path.GetFullPath(fileName);
+    string folder = Path.GetDirectoryName(fullName)!;
+    var shortName = Path.GetFileName(fullName);
     var segments = shortName.Split('.');
     if(segments.Length < 5)
     {
@@ -61,9 +123,66 @@ public class GitBupBundle
     {
       return null;
     }
+    if(tier < 0 || tier > 9)
+    {
+      return null;
+    }
+    if(tier > 0 && !IsValidId(refId))
+    {
+      return null;
+    }
     var id = segments[^4];
-    var prefix = String.Join(".", segments[0..^5]);
-    throw new NotImplementedException();
+    if(!IsValidId(id))
+    {
+      return null;
+    }
+    var head = segments[..^4];
+    var prefix = String.Join(".", head);
+    string? refId2 = tier == 0 ? null : refId;
+    return new GitBupBundle(folder, prefix, tier, id, refId2);
+  }
+
+  /// <summary>
+  /// Create a GitBupBundle instance for a new tier 0 bundle
+  /// </summary>
+  /// <param name="folder">
+  /// The folder where the bundle is expected to be created
+  /// </param>
+  /// <param name="prefix">
+  /// The bundle prefix (repository name)
+  /// </param>
+  /// <param name="overrideStamp">
+  /// Normally null (default). If not null: override the time stamp
+  /// used to derive the bundle ID. This is intended for use in unit tests only.
+  /// </param>
+  /// <returns>
+  /// A new <see cref="GitBupBundle"/> (for which the backing file does not yet exist)
+  /// </returns>
+  public static GitBupBundle NewTier0Bundle(
+    string folder, string prefix, DateTime? overrideStamp = null)
+  {
+    var stamp = (overrideStamp ?? DateTime.UtcNow).ToUniversalTime();
+    var id = stamp.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+    folder = String.IsNullOrEmpty(folder) ? Environment.CurrentDirectory : folder;
+    return new GitBupBundle(folder, prefix, 0, id, null);
+  }
+
+  /// <summary>
+  /// Derive the <see cref="GitBupBundle"/> instance for a next tier bundle
+  /// referencing this bundle
+  /// </summary>
+  /// <param name="overrideStamp">
+  /// Normally null (default). If not null: override the time stamp
+  /// used to derive the bundle ID. This is intended for use in unit tests only.
+  /// </param>
+  /// <returns>
+  /// A new <see cref="GitBupBundle"/> (for which the backing file does not yet exist)
+  /// </returns>
+  public GitBupBundle DeriveBundle(DateTime? overrideStamp = null)
+  {
+    var stamp = (overrideStamp ?? DateTime.UtcNow).ToUniversalTime();
+    var id = stamp.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+    return new GitBupBundle(Folder, Prefix, Tier+1, id, Id);
   }
 
   /// <summary>
@@ -103,4 +222,48 @@ public class GitBupBundle
   /// The filename for the metadata
   /// </summary>
   public string MetaFileName { get; init; }
+
+  /// <summary>
+  /// Return true if the bundle and the metadata files exist
+  /// </summary>
+  public bool DoesExist() => File.Exists(BundleFileName) && File.Exists(MetaFileName);
+
+  /// <summary>
+  /// Soft-delete the bundle and metadata files by renaming them.
+  /// </summary>
+  public void Discard()
+  {
+    if(File.Exists(BundleFileName))
+    {
+      File.Move(BundleFileName, BundleFileName+".bak", true);
+    }
+    if(File.Exists(MetaFileName))
+    {
+      File.Move(MetaFileName, MetaFileName+".bak", true);
+    }
+  }
+
+  /// <summary>
+  /// Check if this GitBupBundle is directly referencing the 
+  /// given parent bundle
+  /// </summary>
+  public bool IsReferencing(GitBupBundle parent)
+  {
+    return
+      Tier == parent.Tier + 1
+      && Prefix == parent.Prefix
+      && RefId == parent.Id
+      ;
+  }
+
+  /// <summary>
+  /// Check if the string is a valid (and nondegenerate) GitBup bundle ID
+  /// </summary>
+  public static bool IsValidId(string id)
+  {
+    return __BundleIdRegex.IsMatch(id);
+  }
+
+  private static readonly Regex __BundleIdRegex =
+    new Regex(@"^2\d{7}-\d{6}$");
 }
