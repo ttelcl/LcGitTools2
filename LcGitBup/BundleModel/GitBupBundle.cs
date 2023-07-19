@@ -12,6 +12,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
 namespace LcGitBup.BundleModel;
 
 /// <summary>
@@ -219,27 +221,64 @@ public class GitBupBundle
   public string BundleFileName { get; init; }
 
   /// <summary>
-  /// The filename for the metadata
+  /// The full file name for the bundle file
+  /// </summary>
+  public string FullBundleFileName => Path.Combine(Folder, BundleFileName);
+
+  /// <summary>
+  /// The short filename for the metadata
   /// </summary>
   public string MetaFileName { get; init; }
 
   /// <summary>
+  /// The full file name for the metadata file
+  /// </summary>
+  public string FullMetaFileName => Path.Combine(Folder, MetaFileName);
+
+  /// <summary>
   /// Return true if the bundle and the metadata files exist
   /// </summary>
-  public bool DoesExist() => File.Exists(BundleFileName) && File.Exists(MetaFileName);
+  public bool DoesExist() => File.Exists(FullBundleFileName) && File.Exists(FullMetaFileName);
+
+  /// <summary>
+  /// Read the bundle's metadata. Check <see cref="DoesExist()"/> to make sure
+  /// the metadata file actually exists
+  /// </summary>
+  /// <returns>
+  /// A new BundleMetadata instance
+  /// </returns>
+  public BundleMetadata ReadMetadata()
+  {
+    var json = File.ReadAllText(FullMetaFileName);
+    return JsonConvert.DeserializeObject<BundleMetadata>(json) 
+      ?? throw new InvalidDataException($"Error reading {MetaFileName}");
+  }
+
+  /// <summary>
+  /// Save the provided metadata as the metadata for this bundle
+  /// (overwriting any existing metdata)
+  /// </summary>
+  /// <param name="metadata">
+  /// The metadata object to persist
+  /// </param>
+  public void SaveMetadata(BundleMetadata metadata)
+  {
+    var json = JsonConvert.SerializeObject(metadata, Formatting.Indented);
+    File.WriteAllText(FullMetaFileName, json);
+  }
 
   /// <summary>
   /// Soft-delete the bundle and metadata files by renaming them.
   /// </summary>
   public void Discard()
   {
-    if(File.Exists(BundleFileName))
+    if(File.Exists(FullBundleFileName))
     {
-      File.Move(BundleFileName, BundleFileName+".bak", true);
+      File.Move(FullBundleFileName, FullBundleFileName+".bak", true);
     }
-    if(File.Exists(MetaFileName))
+    if(File.Exists(FullMetaFileName))
     {
-      File.Move(MetaFileName, MetaFileName+".bak", true);
+      File.Move(FullMetaFileName, FullMetaFileName+".bak", true);
     }
   }
 

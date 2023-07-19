@@ -34,6 +34,9 @@ let usage detail =
   cp "   \fg-show\f0       Show the currently configured destination folder."
   cp "   \fg-anchor\f0     Change the destination to a child of one of the anchor folders"
   cp "   \fg-local\f0      Change the destination to a folder inside the git folder itself"
+  cp ""
+  cp "\fogitbup metadata\f0"
+  cp "   Show the current metadata state of the repository"
   
 
 

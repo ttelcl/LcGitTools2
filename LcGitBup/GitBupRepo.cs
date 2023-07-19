@@ -14,6 +14,8 @@ using LcGitLib2.RepoTools;
 using LcGitBup.Configuration;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
+using LcGitBup.BundleModel;
+using LcGitLib2.GitRunning;
 
 namespace LcGitBup;
 
@@ -27,7 +29,9 @@ public class GitBupRepo
   /// <summary>
   /// Create a new GitBupRepo instance
   /// </summary>
-  internal GitBupRepo(GitBupService owner, GitRepository repository)
+  internal GitBupRepo(
+    GitBupService owner,
+    GitRepository repository)
   {
     Repository = repository;
     Owner = owner;
@@ -194,6 +198,39 @@ public class GitBupRepo
     var cfg = GetConfig();
     cfg.RepoName = newLabel;
     _repoConfig.Save();
+  }
+
+  /// <summary>
+  /// Return a new bundle info object. Throws an exception if
+  /// no target folder is set.
+  /// </summary>
+  public BundleSet GetBundleInfo()
+  {
+    if(!TryGetTarget(out var targetFolder))
+    {
+      throw new InvalidOperationException(
+        $"No target folder defined for this repository");
+    }
+    return new BundleSet(targetFolder, RepoLabel);
+  }
+
+  /// <summary>
+  /// Retrieve the metadata for the current state of the repository
+  /// (this spawns a git child process running 'git log').
+  /// </summary>
+  /// <param name="gitRunner">
+  /// The git running host
+  /// </param>
+  /// <returns></returns>
+  public BundleMetadata GetCurrentRepoMetadata(
+    GitCommandHost gitRunner)
+  {
+    var commitMap = gitRunner.LoadCommitMap(Repository.RepoFolder);
+    commitMap.PruneMissing();
+    var metadata = new BundleMetadata(
+      commitMap.Tips.Select(node => node.Id.Id),
+      commitMap.Roots.Select(node => node.Id.Id));
+    return metadata;
   }
 
   /// <summary>

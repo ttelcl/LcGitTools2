@@ -77,5 +77,27 @@ public class LcGitBupTests
     Assert.Equal(@"test.prefix.20230719-014403.20230719-010203.t1.bundle", b1.BundleFileName);
   }
 
+  [Fact(/*Skip = "not universal"*/)]
+  public void CanMakeBundleStack()
+  {
+    const string testfolder = @"k:\git-bundles\LcGitTools-dbg";
+    Assert.True(Directory.Exists(testfolder));
+
+    var bundleSet = new BundleSet(testfolder, "dev");
+
+    Assert.NotEmpty(bundleSet.AllBundles);
+    _outputHelper.WriteLine("Found the following bundles:");
+    foreach(var bundle in bundleSet.AllBundles)
+    {
+      _outputHelper.WriteLine($" - '{bundle.BundleFileName}' ({bundle.DoesExist()})");
+    }
+    _outputHelper.WriteLine("Tier stack:");
+    var stack = bundleSet.TierStack;
+    for(var i = stack.Depth-1; i >= 0; i--)
+    {
+      var bundle = stack.Tiers[i];
+      _outputHelper.WriteLine($" {bundle.Tier}: {bundle.BundleFileName}");
+    }
+  }
 
 }
