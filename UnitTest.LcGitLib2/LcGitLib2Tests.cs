@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace UnitTest.LcGitLib2;
 
-public class ConfigurationTests
+public class LcGitLib2Tests
 {
   private readonly ITestOutputHelper _outputHelper;
 
@@ -18,7 +18,7 @@ public class ConfigurationTests
    * (https://stackoverflow.com/a/61182227/271323)
    */
 
-  public ConfigurationTests(ITestOutputHelper outputHelper)
+  public LcGitLib2Tests(ITestOutputHelper outputHelper)
   {
     _outputHelper = outputHelper;
   }
