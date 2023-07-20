@@ -7,12 +7,13 @@ open ExceptionTool
 open Usage
 
 let rec run arglist =
-  // For subcommand based apps, split based on subcommand here
   match arglist with
   | "-v" :: rest ->
     verbose <- true
     rest |> run
   | "--help" :: _
+  | "-help" :: _
+  | "help" :: _
   | "-h" :: _
   | [] ->
     usage "all"
@@ -28,6 +29,9 @@ let rec run arglist =
     rest |> AppFolder.runFolder
   | "name" :: rest ->
     rest |> AppName.runName
+  | "meta" :: rest
+  | "metadata" :: rest ->
+    rest |> AppMetadata.runMetadata
   | x :: _ ->
     failwith $"Unrecognized command: '{x}'"
     1

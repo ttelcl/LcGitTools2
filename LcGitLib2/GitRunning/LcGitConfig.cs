@@ -79,32 +79,19 @@ public class LcGitConfig
   /// settings if the configuration file is missing. When falling back,
   /// no new configuration is written.
   /// </summary>
-  public static LcGitConfig LoadDefault(bool doCheck = true)
+  public static LcGitConfig LoadDefault()
   {
     if(!File.Exists(ConfigFile))
     {
-      //if(doCheck)
-      //{
-      //  throw new InvalidOperationException(
-      //    $"The lcgitlib config file is missing: {ConfigFile}");
-      //}
-      var gitPath = LocateGitExecutable();
-      if(gitPath == null)
-      {
-        throw new InvalidOperationException(
-          "Unable to locate the default git executable on this system");
-      }
-      return new LcGitConfig(gitPath, doCheck);
+      return GetDefault();
     }
     else
     {
       var json = File.ReadAllText(ConfigFile);
-      var cfg = JsonConvert.DeserializeObject<LcGitConfig>(json);
-      if(cfg == null)
-      {
-        throw new InvalidOperationException(
+      var cfg =
+        JsonConvert.DeserializeObject<LcGitConfig>(json)
+        ?? throw new InvalidOperationException(
           "Bad configuration: Configuration file content deserialized to null.");
-      }
       return cfg;
     }
   }
@@ -117,12 +104,10 @@ public class LcGitConfig
   {
     if(__default == null)
     {
-      var gitPath = LocateGitExecutable();
-      if(gitPath == null)
-      {
-        throw new InvalidOperationException(
+      var gitPath =
+        LocateGitExecutable()
+        ?? throw new InvalidOperationException(
           "Unable to locate the default git executable on this system");
-      }
       __default = new LcGitConfig(gitPath, false);
     }
     return __default;

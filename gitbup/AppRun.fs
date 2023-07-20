@@ -36,6 +36,8 @@ let runRun args =
       rest |> parseMore {o with Tier = Some(n)}
     | "-full" :: rest ->
       rest |> parseMore {o with Tier = Some(0)}
+    | "-auto" :: rest ->
+      rest |> parseMore {o with Tier = None}
     | x :: rest when x.Length = 3 && x.StartsWith("-t") && x[2]>='0' && x[2]<='9' ->
       let n = int(x[2]-'0');
       rest |> parseMore {o with Tier = Some(n)}

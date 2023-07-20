@@ -115,7 +115,7 @@ public class GitBupService
   }
 
   /// <summary>
-  /// Get the configuration object. If there was none, a new one is
+  /// Get the (global) configuration object. If there was none, a new one is
   /// created with the default settings.
   /// </summary>
   public GitBupConfig GetConfig()

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <VersionPrefix>1.0.1</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -13,13 +14,14 @@
   <ItemGroup>
     <Compile Include="ColorPrint.fs" />
     <Compile Include="CommonTools.fs" />
-    <Compile Include="PrintUtils.fs" />
     <Compile Include="ExceptionTool.fs" />
+    <Compile Include="GitCmdLogging.fs" />
     <Compile Include="Usage.fs" />
     <Compile Include="AppRun.fs" />
     <Compile Include="AppAnchor.fs" />
     <Compile Include="AppFolder.fs" />
     <Compile Include="AppName.fs" />
+    <Compile Include="AppMetadata.fs" />
     <Compile Include="Program.fs" />
     <None Include="README.md" />
   </ItemGroup>
