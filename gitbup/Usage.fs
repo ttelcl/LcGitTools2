@@ -36,7 +36,7 @@ let usage detail =
   cp "   \fg-anchor\f0     Change the destination to a child of one of the anchor folders"
   cp "   \fg-local\f0      Change the destination to a folder inside the git folder itself"
   cp ""
-  cp "\fogitbup metadata\f0 [\fg-show\f0|\fg-save \fc<file.json>\f0]"
+  cp "\fogitbup metadata\f0 [\fg-show\f0|\fg-save-as \fc<file.json>\f0|\fg-save\f0]"
   cp "   Show or save the current metadata state of the repository"
   
 

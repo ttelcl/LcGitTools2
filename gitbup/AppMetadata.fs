@@ -11,10 +11,13 @@ open LcGitBup.BundleModel
 open ColorPrint
 open CommonTools
 open Newtonsoft.Json
+open LcGitBup
+open System.Globalization
 
 type private MetaCommand =
   | Show
-  | Save of string
+  | SaveAs of string
+  | SaveAuto
 
 type private MetaOptions = {
   RepoPath: string
@@ -36,8 +39,12 @@ let runMetadata args =
     | "-show" :: rest 
     | "-view" :: rest ->
       rest |> parseMore {o with Command = MetaCommand.Show}
-    | "-save" :: file :: rest ->
-      rest |> parseMore {o with Command = MetaCommand.Save(file)}
+    | "-saveas" :: file :: rest
+    | "-save-as" :: file :: rest ->
+      rest |> parseMore {o with Command = MetaCommand.SaveAs(file)}
+    | "-save" :: rest
+    | "-save-auto" :: rest ->
+      rest |> parseMore {o with Command = MetaCommand.SaveAuto}
     | x :: _ ->
       failwith $"Unrecognized argument '{x}'"
   let oo = args |> parseMore {
@@ -59,6 +66,15 @@ let runMetadata args =
     if tips.Length >= 100 then
       cp $"\foWarning\f0! \fyThe number of tip commits in this repository is excessively high; incremental bundles may be unreliable\f0!"
 
+    let saveTo fileName =
+      let tipNames = tips |> Array.map (fun cin -> cin.Id.Id)
+      let rootNames = roots |> Array.map (fun cin -> cin.Id.Id)
+      let bundleMeta = new BundleMetadata(tipNames, rootNames)
+      let json = JsonConvert.SerializeObject(bundleMeta, Formatting.Indented);
+      let file = Path.GetFullPath(fileName)
+      cp $"Saving \fg{file}\f0."
+      File.WriteAllText(file, json);
+      
     match o.Command with
     | MetaCommand.Show ->
       if tips.Length + roots.Length > 64 then
@@ -72,15 +88,28 @@ let runMetadata args =
         for root in roots do
           cp $"  \fc{root.Id.Id}\f0."
         0
-    | MetaCommand.Save(file) ->
-      let file = Path.GetFullPath(file)
-      cp $"Saving \fg{file}\f0."
-      let tipNames = tips |> Array.map (fun cin -> cin.Id.Id)
-      let rootNames = roots |> Array.map (fun cin -> cin.Id.Id)
-      let bundleMeta = new BundleMetadata(tipNames, rootNames)
-      let json = JsonConvert.SerializeObject(bundleMeta, Formatting.Indented);
-      File.WriteAllText(file, json);
+    | MetaCommand.SaveAs(file) ->
+      file |> saveTo
       0
+    | MetaCommand.SaveAuto ->
+      let svc = new GitBupService()
+      let repoPath = if o.RepoPath |> String.IsNullOrEmpty then Environment.CurrentDirectory else o.RepoPath
+      let repo = GitRepository.Locate(repoPath, true)
+      let gbr = repo |> svc.GetRepo
+      if gbr.HasTarget |> not then
+        cp $"\foNo target folder has been set for that repository yet\f0. \fyUse \fg-save-as\fy instead\f0."
+        1
+      else
+        let ok, target = gbr.TryGetTarget()
+        if ok |> not then
+          cp $"\foNo target folder has been set for that repository yet\f0. \fyUse \fg-save-as\fy instead\f0."
+          1
+        else
+          let stamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture)
+          let shortName = $"{gbr.RepoLabel}.{stamp}.meta.ignore.json"
+          let fileName = Path.Combine(target, shortName)
+          fileName |> saveTo
+          0
   | None ->
     Usage.usage "metadata"
     0
