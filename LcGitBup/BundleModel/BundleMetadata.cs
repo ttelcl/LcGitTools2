@@ -27,10 +27,14 @@ public class BundleMetadata
   /// </summary>
   public BundleMetadata(
     [JsonProperty("git-bundle-tips")] IEnumerable<string> gitBundleTips,
-    [JsonProperty("git-repo-roots")] IEnumerable<string>? gitRepoRoots = null)
+    [JsonProperty("git-repo-roots")] IEnumerable<string>? gitRepoRoots,
+    [JsonProperty("git-commit-count")] int gitCommitCount,
+    [JsonProperty("git-missing-count")] int gitMissingCommitCount = 0)
   {
     GitBundleTips = new List<string>(gitBundleTips ?? Array.Empty<string>()).AsReadOnly();
     GitRepoRoots = new List<string>(gitRepoRoots ?? Array.Empty<string>()).AsReadOnly();
+    GitCommitCount = gitCommitCount;
+    GitMissingCommitCount = gitMissingCommitCount;
   }
 
   /// <summary>
@@ -47,7 +51,28 @@ public class BundleMetadata
   /// the root(s) are the oldest commit(s).). Usually there is only one
   /// root in a repo.
   /// </summary>
-  [JsonProperty("git-repo-roots")] 
+  [JsonProperty("git-repo-roots")]
   public IReadOnlyList<string> GitRepoRoots { get; init; }
+
+  /// <summary>
+  /// The total number of commits in the repo
+  /// </summary>
+  [JsonProperty("git-commit-count")]
+  public int GitCommitCount { get; init; }
+
+  /// <summary>
+  /// The number of detected missing commits in the repo. Not serialized if 0.
+  /// </summary>
+  [JsonProperty("git-missing-count")]
+  public int GitMissingCommitCount { get; init; }
+
+  /// <summary>
+  /// Determine if the <see cref="GitMissingCommitCount"/> property should be
+  /// serialized
+  /// </summary>
+  public bool ShouldSerializeGitMissingCommitCount()
+  {
+    return GitMissingCommitCount > 0;
+  }
 
 }

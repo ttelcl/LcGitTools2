@@ -69,7 +69,7 @@ let runMetadata args =
     let saveTo fileName =
       let tipNames = tips |> Array.map (fun cin -> cin.Id.Id)
       let rootNames = roots |> Array.map (fun cin -> cin.Id.Id)
-      let bundleMeta = new BundleMetadata(tipNames, rootNames)
+      let bundleMeta = new BundleMetadata(tipNames, rootNames, commits.Length, pruned.Length);
       let json = JsonConvert.SerializeObject(bundleMeta, Formatting.Indented);
       let file = Path.GetFullPath(fileName)
       cp $"Saving \fg{file}\f0."

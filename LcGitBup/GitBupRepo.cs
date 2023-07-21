@@ -226,10 +226,12 @@ public class GitBupRepo
     GitCommandHost gitRunner)
   {
     var commitMap = gitRunner.LoadCommitMap(Repository.RepoFolder);
-    commitMap.PruneMissing();
+    var missing = commitMap.PruneMissing();
     var metadata = new BundleMetadata(
       commitMap.Tips.Select(node => node.Id.Id),
-      commitMap.Roots.Select(node => node.Id.Id));
+      commitMap.Roots.Select(node => node.Id.Id),
+      commitMap.Nodes.Count,
+      missing.Count);
     return metadata;
   }
 
