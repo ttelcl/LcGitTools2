@@ -22,6 +22,7 @@ type private RunContext = {
   Options: RunOptions
   TargetFolder: string
   BupRepo: GitBupRepo
+  CurrentMeta: BundleMetadata
   Host: GitCommandHost
 }
 
@@ -31,6 +32,10 @@ type private ExecuteContext = {
   CurrentMeta: BundleMetadata
   Bundles: BundleSet
 }
+
+let private bundleSize (bundle: GitBupBundle) =
+  let fi = new FileInfo(bundle.FullBundleFileName)
+  fi.Length
 
 let private bundleRun ectx =
   // actually execute GIT to create the bundle, and postprocess
@@ -64,7 +69,7 @@ let private bundleFull context =
   let bundles = context.BupRepo.GetBundleInfo()
   let bundle = bundles.NextBundle(0)
   cp $"Creating new full-backup bundle \fc{bundle.Folder}\f0{Path.DirectorySeparatorChar}\fg{bundle.BundleFileName}\f0."
-  let meta = context.BupRepo.GetCurrentRepoMetadata(context.Host)
+  let meta = context.CurrentMeta
   let cmd =
     context.Host.NewCommand()
       .WithFolder(context.BupRepo.Repository.RepoFolder)
@@ -101,7 +106,7 @@ let rec private bundleIncremental tier context =
       context |> bundleFull
     else
       let bundle = bundles.NextBundle(tier)
-      let meta = context.BupRepo.GetCurrentRepoMetadata(context.Host)
+      let meta = context.CurrentMeta
       let added, removed = meta.CompareToAncestor refMeta
       cp $"Using bundle \fC{reference.BundleFileName}\f0 as reference for incremental bundling."
       cp $"The set of tip commits has \fg{added.Count}\f0 additions and \fo{removed.Count}\f0 removals."
@@ -128,6 +133,56 @@ let rec private bundleIncremental tier context =
           Bundles = bundles
         }
 
+
+/// The core "-tier auto" algorithm, turning a list of tier bundle file sizes into the next tier id
+let autoTier (tierSizes: int64[]) =
+  // algorithm parameters
+  let minimumBundleSize = 0x2000L
+  let maxTier = 5
+  let k0 = 1L
+  let k1 = 1L
+  // the actual algorithm
+  if tierSizes.Length = 0 then
+    0
+  else
+    let tailIndex = tierSizes.Length - 1
+    if tailIndex > 0 && tierSizes[tailIndex] * k0 > tierSizes[tailIndex-1] * k1 then
+      // The size of the tail tier is larger than the previous tier: re-bundle the previous tier.
+      // Note that it is quite likely that next round this will repeat to an even older tier.
+      // To combat that effect we use the k0 and k1 constants to dampen it.
+      tailIndex - 1
+    elif tierSizes[tailIndex] < minimumBundleSize then
+      // The size of the tail tier bundle is small: re-bundle it
+      tailIndex
+    elif tailIndex >= maxTier then
+      // use the tail index anyway: we reached maximum depth
+      tailIndex
+    else
+      tailIndex + 1
+
+let private bundleAuto context =
+  let bundles = context.BupRepo.GetBundleInfo()
+  let stack = bundles.TierStack
+  let skip = // avoid bundling for bundling's sake: detect if there are no changes
+    if stack.Depth = 0 then
+      false
+    else
+      let tail = stack.Tiers[stack.Depth-1]
+      let tailMeta = tail.ReadMetadata()
+      let repoMeta = context.CurrentMeta
+      let added, removed = repoMeta.CompareToAncestor tailMeta
+      added.Count + removed.Count = 0
+  if skip then
+    cp $"\fyauto-tier: \foSkip!\fy. There appear to be no changes since the latest bundle\f0."
+    1
+  else
+    let tierSizes = stack.Tiers |> Seq.map bundleSize |> Seq.toArray
+    let nextTier = tierSizes |> autoTier
+    cp $"\fyauto-tier: \fg{nextTier}\f0."
+    if nextTier = 0 then
+      context |> bundleFull
+    else
+      context |> bundleIncremental nextTier
 
 let runRun args =
   let rec parseMore o args =
@@ -174,16 +229,17 @@ let runRun args =
       let hasTarget, target = repocfg.TryGetTarget()
       if hasTarget then
         let host = GitCmdLogging.makeDefaultHost true
+        let meta = repocfg.GetCurrentRepoMetadata(host)
         let context = {
           Options = o
           TargetFolder = target
           BupRepo = repocfg
           Host = host
+          CurrentMeta = meta
         }
         match o.Tier with
         | None ->
-          failwith "NYI - 'auto'"
-          0
+          context |> bundleAuto
         | Some(0) ->
           context |> bundleFull
         | Some(tier) ->
