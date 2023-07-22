@@ -24,6 +24,35 @@ type private MetaOptions = {
   Command: StatusCommand
 }
 
+type private BundleInfo = {
+  Bundle: GitBupBundle
+  LocalStamp: DateTimeOffset
+  Meta: BundleMetadata
+  BundleSize: int64
+}
+
+let private collectBundleInfo (bundle: GitBupBundle) =
+  let meta = bundle.ReadMetadata()
+  let stamp =
+    DateTimeOffset.ParseExact(
+      bundle.Id,
+      "yyyyMMdd-HHmmss",
+      CultureInfo.InvariantCulture,
+      DateTimeStyles.AdjustToUniversal ||| DateTimeStyles.AssumeUniversal).ToLocalTime()
+  let fi = new FileInfo(bundle.FullBundleFileName)
+  {
+    Bundle = bundle
+    LocalStamp = stamp
+    Meta = meta
+    BundleSize = fi.Length
+  }
+
+let private commits bi =
+  bi.Meta.GitCommitCount
+
+let private bundleTime bi =
+  bi.LocalStamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+
 let runStatus args =
   let rec parseMore o args =
     match args with
@@ -71,13 +100,20 @@ let runStatus args =
                 // Unusual case; may happen after changing the repo label but not the repo folder
                 cp $"  \foNo bundles have been created yet \f0(for the tag '\fy{bundles.Prefix}\f0')."
               else
-                cp $"  The bundle stack depth is \fb{tiers.Tiers.Count}\f0:"
-                let bundle = tiers.Tiers[0]
-                cp $"  Tier 0: {bundle.BundleFileName} (\frWIP\f0)"
-                for i in 1..tiers.Tiers.Count-1 do
-                  let bundle = tiers.Tiers[i]
-                  let bundle0  = tiers.Tiers[i-1]
-                  cp $"  Tier {i}: {bundle.BundleFileName} (\frWIP\f0)"
+                cp $"  There are currently \fo{tiers.Tiers.Count}\f0 bundle tiers:"
+                let bundles = tiers.Tiers |> Seq.toArray
+                let bundleInfos = bundles |> Array.map collectBundleInfo
+                let bundle = bundles[0]
+                let bi = bundleInfos[0]
+                cpx $"  t0: \fk{bundle.Prefix}\f0.\fb{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
+                cp $"  \fc%d{bi |> commits}\f0 commits"
+                for i in 1..bundles.Length-1 do
+                  let bundle = bundles[i]
+                  let bi = bundleInfos[i]
+                  let bi0 = bundleInfos[i-1]
+                  let deltaCommit = commits(bi) - commits(bi0)
+                  cpx $"  t{i}: \fk{bundle.Prefix}\f0.\fg{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
+                  cp $"  \fc%d{bi |> commits}\f0 (\fb+{deltaCommit}\f0) commits"
                   ()
           else
             cp $"  Bundle directory: \fo{target}\f0 (\frdirectory does not exist\f0)."
