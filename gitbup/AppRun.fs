@@ -139,8 +139,8 @@ let autoTier (tierSizes: int64[]) =
   // algorithm parameters
   let minimumBundleSize = 0x2000L
   let maxTier = 5
-  let k0 = 1L
-  let k1 = 1L
+  let k0 = 3L
+  let k1 = 2L
   // the actual algorithm
   if tierSizes.Length = 0 then
     0
