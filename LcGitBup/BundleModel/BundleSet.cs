@@ -168,6 +168,56 @@ public class BundleSet
   }
 
   /// <summary>
+  /// Delete old discarded bundles. The aim is to leave ay most one discarded bundle
+  /// per tier (in addition to the non-discarded one, of course)
+  /// </summary>
+  public IReadOnlyList<string> Purge()
+  {
+    var purgedBundles = new List<GitBupBundle>();
+    var di = new DirectoryInfo(Folder);
+    if(di.Exists)
+    {
+      var candidates =
+        di.GetFiles("*.t?.bundle.bak")
+        .Where(fi => fi.Name.StartsWith(Prefix))
+        .ToList();
+      var discards = new List<GitBupBundle>();
+      foreach(var candidate in candidates)
+      {
+        var name = candidate.FullName[..^4]; // strip off the ".bak" extension
+        var gbb = GitBupBundle.FromBundleName(name);
+        if(gbb != null)
+        {
+          discards.Add(gbb);
+        }
+      }
+      var byTier = discards.GroupBy(gbb => gbb.Tier);
+      foreach(var tier in byTier)
+      {
+        var ghostBundles = tier.OrderByDescending(gbb => gbb.Id).ToList();
+        purgedBundles.AddRange(ghostBundles.Skip(1));
+      }
+    }
+    var purgedFiles = new List<string>();
+    foreach(var bundle in purgedBundles)
+    {
+      var purgedFile = bundle.FullBundleFileName + ".bak";
+      if(File.Exists(purgedFile))
+      {
+        purgedFiles.Add(purgedFile);
+        File.Delete(purgedFile);
+      }
+      var purgedMeta = bundle.FullMetaFileName + ".bak";
+      if(File.Exists(purgedMeta))
+      {
+        purgedFiles.Add(purgedMeta);
+        File.Delete(purgedMeta);
+      }
+    }
+    return purgedFiles.AsReadOnly();
+  }
+
+  /// <summary>
   /// Find a referenced bundle (returning null if not found or there is no reference)
   /// </summary>
   public GitBupBundle? FindReferencedBundle(GitBupBundle bundle)

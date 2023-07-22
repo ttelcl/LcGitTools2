@@ -50,6 +50,12 @@ let private bundleRun ectx =
       cp "Discarding the following outdated bundles:"
       for discard in discards do
         cp $"  \fk{discard.BundleFileName}\f0."
+      let purges = ectx.Bundles.Purge()
+      purges |> ignore
+      //if purges.Count > 0 then
+      //  cp $"\foPurged \fy{purges.Count / 2}\fo old backups."
+      //  for purge in purges do // DBG
+      //    cp $" would have deleted {purge}"
   else
     cp $"\frError: status = {status}\f0."
   status
