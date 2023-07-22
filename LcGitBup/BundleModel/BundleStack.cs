@@ -54,6 +54,7 @@ public class BundleStack
       _stack.Add(previousBundle);
       latestBundle = previousBundle;
     }
+    _stack.Reverse();
   }
 
   /// <summary>

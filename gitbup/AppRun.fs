@@ -25,6 +25,35 @@ type private RunContext = {
   Host: GitCommandHost
 }
 
+type private ExecuteContext = {
+  Command: GitCommand
+  Bundle: GitBupBundle
+  CurrentMeta: BundleMetadata
+  Bundles: BundleSet
+}
+
+let private bundleRun ectx =
+  // actually execute GIT to create the bundle, and postprocess
+  let cmd = ectx.Command
+  let bundle = ectx.Bundle
+  let meta = ectx.CurrentMeta
+  let status = cmd.RunToConsole()
+  if status = 0 then
+    cp $"\fgSuccess\f0!"
+    cp $"Saving metadata \fc{bundle.Folder}\f0{Path.DirectorySeparatorChar}\fy{bundle.MetaFileName}\f0."
+    bundle.SaveMetadata(meta)
+    ectx.Bundles.AddMissing() |> ignore
+    let discards = ectx.Bundles.DiscardUnused()
+    if discards.Count = 0 then
+      cp "(no older bundles were discarded)"
+    else
+      cp "Discarding the following outdated bundles:"
+      for discard in discards do
+        cp $"  \fk{discard.BundleFileName}\f0."
+  else
+    cp $"\frError: status = {status}\f0."
+  status
+
 let private bundleFull context =
   let bundles = context.BupRepo.GetBundleInfo()
   let bundle = bundles.NextBundle(0)
@@ -37,18 +66,62 @@ let private bundleFull context =
       .AddPost("create")
       .AddPost(bundle.FullBundleFileName)
       .AddPost("--all")
-  let status = cmd.RunToConsole()
-  if status = 0 then
-    cp $"\fgSuccess\f0!"
-    cp $"Saving metadata \fc{bundle.Folder}\f0{Path.DirectorySeparatorChar}\fy{bundle.MetaFileName}\f0."
-    bundle.SaveMetadata(meta)
-    cp $"\frFurther post-processing NYI\f0!"
-  else
-    cp $"\frError: status = {status}\f0."
-  status
+  bundleRun {
+    Bundle = bundle
+    Command = cmd
+    CurrentMeta = meta
+    Bundles = bundles
+  }
 
-let private bundleIncremental tier context =
-  ()
+let rec private bundleIncremental tier context =
+  let bundles = context.BupRepo.GetBundleInfo()
+  if bundles.TierStack.Depth < tier then
+    let tierRequested = tier
+    let tier = bundles.TierStack.Depth
+    if tier = 0 then
+      cp $"\foTier \fb{tierRequested}\fo is not available yet. \fyDowntiering to \fgtier 0\fy (full backup)\f0 ."
+      context |> bundleFull
+    else
+      cp $"\foTier \fb{tierRequested}\fo is not available yet. \fyDowntiering to \fctier {tier}\f0."
+      context |> bundleIncremental tier
+  else
+    let reference = bundles.TierStack.Tiers[tier-1]
+    if reference.DoesExist() |> not then
+      failwith $"Metadata file is missing: {reference.FullMetaFileName}"
+    let refMeta = reference.ReadMetadata()
+    if refMeta.GitBundleTips.Count > 64 then
+      cp $"\foWARNING! The reference bundle \fy{reference.BundleFileName}\fy has too many tip commits to support incremental bundling\f0."
+      cp $"\foFalling back to a full bundle\f0."
+      context |> bundleFull
+    else
+      let bundle = bundles.NextBundle(tier)
+      let meta = context.BupRepo.GetCurrentRepoMetadata(context.Host)
+      let added, removed = meta.CompareToAncestor refMeta
+      cp $"Using bundle \fC{reference.BundleFileName}\f0 as reference for incremental bundling."
+      cp $"The set of tip commits has \fg{added.Count}\f0 additions and \fo{removed.Count}\f0 removals."
+      if added.Count = 0 && removed.Count = 0 then
+        // is it safe to abort before running git now?
+        cp "\foAborting! \fyIt appears that the repository has not changed since the reference was bundled\f0."
+        1
+      else
+        cp $"Creating new \fytier {bundle.Tier}\f0 bundle \fc{bundle.Folder}\f0{Path.DirectorySeparatorChar}\fg{bundle.BundleFileName}\f0."
+        let cmd =
+          context.Host.NewCommand()
+            .WithFolder(context.BupRepo.Repository.RepoFolder)
+            .WithCommand("bundle")
+            .AddPost("create")
+            .AddPost(bundle.FullBundleFileName)
+            .AddPost("--all")
+        for reftip in refMeta.GitBundleTips do
+          let abbreviated = reftip.Substring(0,8)
+          cmd.AddPost($"^{abbreviated}") |> ignore
+        bundleRun {
+          Bundle = bundle
+          Command = cmd
+          CurrentMeta = meta
+          Bundles = bundles
+        }
+
 
 let runRun args =
   let rec parseMore o args =
@@ -108,8 +181,7 @@ let runRun args =
         | Some(0) ->
           context |> bundleFull
         | Some(tier) ->
-          failwith $"NYI - incremental backup ({tier})"
-          0
+          context |> bundleIncremental tier
       else
         if target |> String.IsNullOrEmpty then
           cp $"\frNo bundle target folder has been configured yet for repository \fo{repo.RepoFolder}\f0."

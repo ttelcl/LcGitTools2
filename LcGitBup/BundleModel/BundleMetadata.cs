@@ -75,4 +75,25 @@ public class BundleMetadata
     return GitMissingCommitCount > 0;
   }
 
+  /// <summary>
+  /// Calculates the set of added and removed commits when comparing this bundle
+  /// with another bundle.
+  /// </summary>
+  /// <param name="ancestor">
+  /// The bundle to compare with
+  /// </param>
+  /// <param name="added">
+  /// Commits that are in this bundle but not the other
+  /// </param>
+  /// <param name="removed">
+  /// Commits that are in the other bundle but not this
+  /// </param>
+  public void CompareToAncestor(
+    BundleMetadata ancestor, out HashSet<string> added, out HashSet<string> removed)
+  {
+    added = new HashSet<string>(GitBundleTips);
+    added.ExceptWith(ancestor.GitBundleTips);
+    removed = new HashSet<string>(ancestor.GitBundleTips);
+    removed.ExceptWith(GitBundleTips);
+  }
 }
