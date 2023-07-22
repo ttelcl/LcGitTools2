@@ -19,6 +19,12 @@ let usage detail =
   cp "   \fg-auto\f0\fx       Alias for \fg-tier \fcauto\f0."
   cp "   \fg-t0\f0, \fg-t1\f0, ... \fg-t9\f0    \fg-t\fcN\f0 is an alias for \fg-tier \fcN\f0."
   cp ""
+  cp "\fogitbup metadata\f0 [\fg-show\f0|\fg-save-as \fc<file.json>\f0|\fg-save\f0]"
+  cp "   Show or save the current metadata state of the repository"
+  cp ""
+  cp "\fogitbup status\f0 [\fg-show\f0]"
+  cp "   Show gitbup configuration and status information"
+  cp ""
   cp "\fogitbup anchor\f0 [\fg-list\f0|\fg-set \fc<tag>\f0 \fc<folder>\f0]"
   cp "   Manage anchor folders (for use by any repository)"
   cp "   [\fg-list\f0]     List the defined anchor folders"
@@ -35,9 +41,6 @@ let usage detail =
   cp "   \fg-show\f0       Show the currently configured destination folder."
   cp "   \fg-anchor\f0     Change the destination to a child of one of the anchor folders"
   cp "   \fg-local\f0      Change the destination to a folder inside the git folder itself"
-  cp ""
-  cp "\fogitbup metadata\f0 [\fg-show\f0|\fg-save-as \fc<file.json>\f0|\fg-save\f0]"
-  cp "   Show or save the current metadata state of the repository"
   
 
 

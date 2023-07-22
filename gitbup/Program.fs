@@ -32,6 +32,8 @@ let rec run arglist =
   | "meta" :: rest
   | "metadata" :: rest ->
     rest |> AppMetadata.runMetadata
+  | "status" :: rest ->
+    rest |> AppStatus.runStatus
   | x :: _ ->
     failwith $"Unrecognized command: '{x}'"
     1

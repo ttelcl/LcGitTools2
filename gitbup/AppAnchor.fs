@@ -55,6 +55,8 @@ let runAnchor args =
     | "-v" :: rest ->
       verbose <- true
       rest |> parseMore o
+    | "-h" :: _ ->
+      None
     | "-C" :: path :: rest ->
       // parse it even though "anchor" doesn't use it
       rest |> parseMore {o with RepoPath = path}

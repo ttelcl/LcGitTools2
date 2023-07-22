@@ -1,18 +1,19 @@
 ﻿module AppMetadata
 
 open System
+open System.Globalization
 open System.IO
+
+open Newtonsoft.Json
 
 open LcGitLib2.RepoTools
 open LcGitLib2.GitRunning
 
+open LcGitBup
 open LcGitBup.BundleModel
 
 open ColorPrint
 open CommonTools
-open Newtonsoft.Json
-open LcGitBup
-open System.Globalization
 
 type private MetaCommand =
   | Show

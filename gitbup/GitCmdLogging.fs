@@ -28,7 +28,7 @@ let private printArguments shortGit (psi:ProcessStartInfo) =
       if phase then
         color Color.Green
       else
-        color Color.Cyan
+        color Color.Yellow
       phase <- not phase
       eprintf " %s" gitArg
     resetColor()

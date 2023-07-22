@@ -22,6 +22,7 @@
     <Compile Include="AppFolder.fs" />
     <Compile Include="AppName.fs" />
     <Compile Include="AppMetadata.fs" />
+    <Compile Include="AppStatus.fs" />
     <Compile Include="Program.fs" />
     <None Include="README.md" />
   </ItemGroup>

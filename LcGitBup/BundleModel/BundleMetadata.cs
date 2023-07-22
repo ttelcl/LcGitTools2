@@ -27,8 +27,8 @@ public class BundleMetadata
   /// </summary>
   public BundleMetadata(
     [JsonProperty("git-bundle-tips")] IEnumerable<string> gitBundleTips,
-    [JsonProperty("git-repo-roots")] IEnumerable<string>? gitRepoRoots,
-    [JsonProperty("git-commit-count")] int gitCommitCount,
+    [JsonProperty("git-repo-roots")] IEnumerable<string>? gitRepoRoots = null,
+    [JsonProperty("git-commit-count")] int gitCommitCount = 0,
     [JsonProperty("git-missing-count")] int gitMissingCommitCount = 0)
   {
     GitBundleTips = new List<string>(gitBundleTips ?? Array.Empty<string>()).AsReadOnly();
