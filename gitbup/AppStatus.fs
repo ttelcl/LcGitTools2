@@ -108,14 +108,16 @@ let runStatus args =
                 let bundleInfos = bundles |> Array.map collectBundleInfo
                 let bundle = bundles[0]
                 let bi = bundleInfos[0]
-                cpx $"  t0: \fk{bundle.Prefix}\f0.\fb{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
+                // \fk{bundle.Prefix}\f0.
+                cpx $"  t0: \fb{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
                 cp $" \fg{bi |> tips}\f0 tips, \fc%d{bi |> commits}\f0 commits"
                 for i in 1..bundles.Length-1 do
                   let bundle = bundles[i]
                   let bi = bundleInfos[i]
                   let bi0 = bundleInfos[i-1]
                   let deltaCommit = commits(bi) - commits(bi0)
-                  cpx $"  t{i}: \fk{bundle.Prefix}\f0.\fg{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
+                  // \fk{bundle.Prefix}\f0.
+                  cpx $"  t{i}: \fg{bundle.Id}\f0, \fy{bi |> bundleTime}\f0, \fo%8d{bi.BundleSize}\f0 bytes,"
                   cp $" \fg{bi |> tips}\f0 tips, \fc%d{bi |> commits}\f0 (\fb+{deltaCommit}\f0) commits"
                   ()
           else
