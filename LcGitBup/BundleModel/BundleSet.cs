@@ -114,11 +114,11 @@ public class BundleSet
     if(tier > 0)
     {
       var reference = TierStack.Tiers[tier-1];
-      return new GitBupBundle(Folder, Prefix, tier, id, reference.Id);
+      return new GitBupBundle(Folder, Prefix, id, reference.Id, tier);
     }
     else
     {
-      return new GitBupBundle(Folder, Prefix, 0, id, null);
+      return new GitBupBundle(Folder, Prefix, id, null, 0);
     }
   }
 
